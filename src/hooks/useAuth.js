@@ -10,6 +10,7 @@ export function useAuth() {
     isLoading,
     error,
     login,
+    register,
     logout,
     clearError,
     isAuthenticated,
@@ -19,6 +20,7 @@ export function useAuth() {
   } = useAuthStore();
 
   const [loginError, setLoginError] = useState(null);
+  const [registererror, setRegisterError] = useState(null);
 
   // Login dengan redirect
   const loginWithRedirect = useCallback(
@@ -43,11 +45,28 @@ export function useAuth() {
           }
         }
       } catch (error) {
-        setLoginError(error.message || 'Login failed');
+        setLoginError(error.message || 'Gagal Login');
       }
     },
     [login, router],
   );
+
+  // Register dengan redirect
+  const registerWithRedirect = useCallback(async (name, email, password) => {
+    setRegisterError(null);
+
+    try {
+      await register(name, email, password);
+      router.push('/penjual/store');
+      router.refresh();
+
+      const user = useAuthStore.getState().user;
+      console.log('ini dari useAuth', user);
+    } catch (err) {
+      setRegisterError('error disini ', err.message || 'Gagal Registrasi');
+      console.log('Disini catch error ', err);
+    }
+  });
 
   // Logout dengan redirect
   const logoutWithRedirect = useCallback(() => {
@@ -87,6 +106,7 @@ export function useAuth() {
     isLoading,
     error: error || loginError,
     loginWithRedirect,
+    registerWithRedirect,
     logoutWithRedirect,
     clearError,
     isAuthenticated,

@@ -1,15 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // import { useRouter } from "next/navigation";
 import { useAuth } from '@/hooks/useAuth';
 
-function LoginForm() {
+function RegisterForm() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { loginWithRedirect, isLoading, error, clearError } = useAuth();
+  const { registerWithRedirect, isLoading, error, clearError } = useAuth();
   // const router = useRouter();
 
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+    if (error) clearError();
+  };
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
     if (error) clearError();
@@ -24,20 +29,21 @@ function LoginForm() {
     e.preventDefault();
 
     // Validasi form sederhana
-    if (!email || !password) {
+    if (!name || !email || !password) {
       return;
     }
 
     // Login dengan redirect
-    await loginWithRedirect(email, password);
+    await registerWithRedirect(name, email, password);
   };
+
   return (
     <>
       <div className="flex min-h-full flex-col justify-center px-6 py-5 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <p className="text-sm text-center">
-            <b>Login</b> dan mulai tampilkan katalog produk batikmu biar makin
-            banyak yang lihat koleksimu.
+            <b>Buat Akun</b> dan mulai tampilkan katalog produk batikmu biar
+            makin banyak yang lihat koleksimu.
           </p>
         </div>
 
@@ -49,6 +55,28 @@ function LoginForm() {
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Nama */}
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm/6 font-medium text-gray-900"
+              >
+                Nama
+              </label>
+              <div className="mt-2">
+                <input
+                  type="name"
+                  name="name"
+                  id="name"
+                  autoComplete="name"
+                  required
+                  value={name}
+                  onChange={handleNameChange}
+                  className="block w-full rounded-md bg-white px-3 py-1.5 border-b border-primary text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:border-none focus:-outline-offset-2 focus:outline-primary sm:text-sm/6"
+                />
+              </div>
+            </div>
+            {/* Email */}
             <div>
               <label
                 htmlFor="email"
@@ -69,7 +97,7 @@ function LoginForm() {
                 />
               </div>
             </div>
-
+            {/* Password */}
             <div>
               <div className="flex items-center justify-between">
                 <label
@@ -101,18 +129,18 @@ function LoginForm() {
                   isLoading ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >
-                {isLoading ? 'Login...' : 'Login'}
+                {isLoading ? 'Membuat akun...' : 'Registrasi'}
               </button>
             </div>
           </form>
 
           <p className="mt-10 text-center text-sm/6 text-gray-500">
-            Belum Punya Akun ?{' '}
+            Sudah punya akun ?{' '}
             <a
               href="/register"
               className="font-semibold text-primary hover:text-indigo-500 hover:cursor-pointer"
             >
-              Registrasi
+              Login
             </a>
           </p>
         </div>
@@ -121,4 +149,4 @@ function LoginForm() {
   );
 }
 
-export default LoginForm;
+export default RegisterForm;

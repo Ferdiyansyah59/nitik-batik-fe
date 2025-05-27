@@ -1,10 +1,10 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { jwtDecode } from "jwt-decode";
-import axios from "axios";
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 // API URL
-const API_URL = process.env.API_ROUTE || "http://localhost:8081/api";
+const API_URL = process.env.API_ROUTE || 'http://localhost:8081/api';
 
 // Create auth store dengan persistensi
 export const useAuthStore = create(
@@ -28,15 +28,15 @@ export const useAuthStore = create(
 
           const token = response.data.data.token;
           const user = response.data.data;
-          console.log(user)
+          console.log(user);
 
           // Update state
           set({ user, token, isLoading: false });
           // Set auth header untuk requests berikutnya
-          axios.defaults.headers.common["Authorization"] = `${token}`;
+          axios.defaults.headers.common['Authorization'] = `${token}`;
         } catch (error) {
           const errorMessage =
-            error.response?.data?.message || "Login failed. Please try again.";
+            error.response?.data?.message || 'Login failed. Please try again.';
           set({
             error: errorMessage,
             isLoading: false,
@@ -47,7 +47,7 @@ export const useAuthStore = create(
       },
 
       // Register action
-      register: async (name, email, password, role) => {
+      register: async (name, email, password, role = 'penjual') => {
         try {
           set({ isLoading: true, error: null });
 
@@ -59,17 +59,19 @@ export const useAuthStore = create(
             role,
           });
 
-          const { user, token } = response.data;
+          const token = response.data.data.token;
+          const user = response.data.data;
+          console.log(user);
 
           // Update state
           set({ user, token, isLoading: false });
 
           // Set auth header untuk requests berikutnya
-          axios.defaults.headers.common["Authorization"] = `${token}`;
+          axios.defaults.headers.common['Authorization'] = `${token}`;
         } catch (error) {
           const errorMessage =
             error.response?.data?.message ||
-            "Registration failed. Please try again.";
+            'Registration failed. Please try again.';
           set({
             error: errorMessage,
             isLoading: false,
@@ -80,7 +82,7 @@ export const useAuthStore = create(
       // Logout action
       logout: () => {
         // Delete auth header
-        delete axios.defaults.headers.common["Authorization"];
+        delete axios.defaults.headers.common['Authorization'];
 
         // Clear state
         set({ user: null, token: null, error: null });
@@ -109,24 +111,24 @@ export const useAuthStore = create(
 
       // Helper untuk cek role
       isAdmin: () => {
-        return get().user?.role === "admin";
+        return get().user?.role === 'admin';
       },
 
       isPenjual: () => {
-        return get().user?.role === "penjual";
+        return get().user?.role === 'penjual';
       },
 
       isPembeli: () => {
-        return get().user?.role === "pembeli";
+        return get().user?.role === 'pembeli';
       },
     }),
     {
-      name: "auth-storage",
+      name: 'auth-storage',
       storage: createJSONStorage(() => ({
         getItem: (name) => {
           // Get dari cookies
           const cookies = document.cookie.split(';');
-          const cookie = cookies.find(c => c.trim().startsWith(`${name}=`));
+          const cookie = cookies.find((c) => c.trim().startsWith(`${name}=`));
           return cookie ? cookie.split('=')[1] : null;
         },
         setItem: (name, value) => {
@@ -136,20 +138,20 @@ export const useAuthStore = create(
         removeItem: (name) => {
           // Hapus cookie
           document.cookie = `${name}=;path=/;max-age=0`;
-        }
+        },
       })),
       partialize: (state) => ({
         user: state.user,
         token: state.token,
       }),
-    }
-  )
+    },
+  ),
 );
 
 // Set auth header dari storage saat aplikasi dimuat
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   const token = useAuthStore.getState().token;
   if (token) {
-    axios.defaults.headers.common["Authorization"] = `${token}`;
+    axios.defaults.headers.common['Authorization'] = `${token}`;
   }
 }
