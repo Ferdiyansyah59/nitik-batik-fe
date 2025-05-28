@@ -1,12 +1,7 @@
 'use client';
-import Description from '@/components/micro/Description';
-import ImageComponent from '@/components/micro/ImageComponent';
-import SectionSubtitle from '@/components/micro/SectionSubtitle';
-import axios from 'axios';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-function Category() {
+import axios from 'axios';
+function CategoryPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,8 +9,7 @@ function Category() {
     axios
       .get('/data/BatikClass.json')
       .then((res) => {
-        const firstFive = res.data.slice(0, 5);
-        setData(firstFive);
+        setData(res.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -24,7 +18,6 @@ function Category() {
       });
   }, []);
 
-  // Membuat mapping warna custom untuk akurasi warna yang lebih baik
   const colorMap = {
     indigo: {
       border: 'border-indigo-500',
@@ -66,13 +59,6 @@ function Category() {
         <h2 className="text-2xl font-bold text-gray-800">
           Kategori Batik Kita
         </h2>
-
-        <Link
-          href="/category"
-          className="text-indigo-600 hover:text-indigo-800 transition-colors text-sm font-medium"
-        >
-          Lihat Semua
-        </Link>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
@@ -111,4 +97,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default CategoryPage;

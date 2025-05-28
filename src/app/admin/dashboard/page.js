@@ -1,34 +1,76 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import useUserStore from '@/store/userStore';
+import useArticleStore from '@/store/articleStore';
+import { useDashboardData } from '@/hooks/useDashboard';
 
 export default function AdminDashboardPage() {
+  const { statistic } = useDashboardData();
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
 
+  // ✅ Loading state untuk menunggu rehydration
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
+
   useEffect(() => {
-    // Check authentication
-    if (!isAuthenticated() || user?.role !== 'admin') {
-      router.push('/login');
+    // ✅ Delay untuk menunggu zustand rehydration
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      setHasCheckedAuth(true);
+    }, 100); // Small delay untuk rehydration
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // ✅ Hanya check auth setelah loading selesai
+    if (!isLoading && hasCheckedAuth) {
+      if (!isAuthenticated() || user?.role !== 'admin') {
+        router.push('/login');
+      }
     }
-  }, [isAuthenticated, user, router]);
+  }, [isLoading, hasCheckedAuth, isAuthenticated, user, router]);
+
+  // ✅ Show loading saat menunggu rehydration
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Show loading jika masih checking auth
+  if (!hasCheckedAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse bg-gray-200 h-12 w-48 rounded mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Mock data untuk dashboard
   const stats = [
     {
       title: 'Total Users',
-      value: '1,234',
-      change: '+12%',
+      value: statistic.totalUsers,
       icon: '👥',
       color: 'blue',
     },
     {
       title: 'Total Articles',
-      value: '567',
-      change: '+23%',
+      value: statistic.totalArticles,
       icon: '📝',
       color: 'green',
     },
@@ -82,6 +124,13 @@ export default function AdminDashboardPage() {
     yellow: 'bg-yellow-100 text-yellow-600',
   };
 
+  const textMap = {
+    blue: 'text-blue-600',
+    green: 'text-green-600',
+    purple: 'ext-purple-600',
+    yellow: 'text-yellow-600',
+  };
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-6">
@@ -104,10 +153,9 @@ export default function AdminDashboardPage() {
                   <p className="text-gray-500 text-sm">{stat.title}</p>
                   <p className="text-2xl font-bold mt-1">{stat.value}</p>
                   <p className="text-sm mt-2">
-                    <span className="text-green-600 font-medium">
-                      {stat.change}
-                    </span>{' '}
-                    from last month
+                    <span className={`${textMap[stat.color]} font-medium`}>
+                      on the NitikBatik platform
+                    </span>
                   </p>
                 </div>
                 <div className={`p-3 rounded-full ${colorMap[stat.color]}`}>

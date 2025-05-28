@@ -1,0 +1,149 @@
+[
+  {
+    "title": "Batik Bali",
+    "img": "/img/category/bali.png",
+    "color": "amber",
+    "description": "Motif yang terinspirasi dari alam dan kehidupan spiritual Bali dengan warna-warna cerah dan vibran."
+  },
+  {
+    "title": "Batik Betawi",
+    "img": "/img/category/betawi.png",
+    "color": "red",
+    "description": "Motif ceria dengan warna kontras, sering menampilkan ondel-ondel dan ikon budaya Betawi lainnya."
+  },
+  {
+    "title": "Batik Kraton",
+    "img": "/img/category/kraton.png",
+    "color": "amber",
+    "description": "Motif eksklusif yang dulu hanya digunakan oleh keluarga kerajaan Jawa."
+  },
+  {
+    "title": "Batik Parang",
+    "img": "/img/category/parang.png",
+    "color": "slate",
+    "description": "Motif garis menyerong yang berarti kekuatan dan ketekunan, salah satu motif tertua di Jawa."
+  },
+  {
+    "title": "Batik Pekalongan",
+    "img": "/img/category/pekalongan.png",
+    "color": "indigo",
+    "description": "Dikenal dengan warna-warni cerah dan motif flora fauna, sangat dipengaruhi budaya Tionghoa dan Belanda."
+  },
+  {
+    "title": "Batik Corak Insang",
+    "img": "/img/category/corak_insang.jpg",
+    "color": "slate",
+    "description": "Motif khas Kalimantan yang menyerupai insang ikan, mencerminkan kehidupan laut."
+  },
+  {
+    "title": "Batik Dayak",
+    "img": "/img/category/dayak.jpg",
+    "color": "amber",
+    "description": "Batik dengan pola khas suku Dayak yang kaya akan makna spiritual dan simbolis."
+  },
+  {
+    "title": "Batik Geblek Renteng",
+    "img": "/img/category/geblek_renteng.jpg",
+    "color": "red",
+    "description": "Motif dari Kulon Progo, terinspirasi dari makanan tradisional geblek yang berbentuk lingkaran."
+  },
+  {
+    "title": "Batik Gentongan",
+    "img": "/img/category/gentongan.jpg",
+    "color": "slate",
+    "description": "Ciri khas Madura dengan warna-warna kontras dan dibuat dengan teknik celup gentong."
+  },
+  {
+    "title": "Batik Kawung",
+    "img": "/img/category/kawung.jpg",
+    "color": "slate",
+    "description": "Motif klasik berbentuk buah kawung, melambangkan kesucian dan pengendalian diri."
+  },
+
+  {
+    "title": "Batik Megamendung",
+    "img": "/img/category/megamendung.jpg",
+    "color": "blue",
+    "description": "Motif awan dari Cirebon yang melambangkan ketenangan dan keteguhan hati."
+  },
+
+  {
+    "title": "Batik Pring Sedapur",
+    "img": "/img/category/pring_sedapur.jpg",
+    "color": "red",
+    "description": "Motif bambu yang menggambarkan kerukunan dan kesederhanaan dalam hidup."
+  },
+  {
+    "title": "Batik Simbut",
+    "img": "/img/category/simbut.jpg",
+    "color": "amber",
+    "description": "Batik khas Banten dengan motif daun simbut sebagai simbol kesuburan."
+  },
+
+  {
+    "title": "Batik Celup",
+    "img": "/img/category/celup.jpg",
+    "color": "red",
+    "description": "Teknik pewarnaan batik dengan metode celup, menghasilkan motif yang unik dan tak beraturan."
+  },
+  {
+    "title": "Batik Cendrawasih",
+    "img": "/img/category/cendrawasih.jpg",
+    "color": "slate",
+    "description": "Motif burung cendrawasih dari Papua yang melambangkan keindahan dan kebebasan."
+  },
+  {
+    "title": "Batik Ceplok",
+    "img": "/img/category/ceplok.jpg",
+    "color": "amber",
+    "description": "Motif geometris berulang yang melambangkan keteraturan dan harmoni."
+  },
+  {
+    "title": "Batik Ciamis",
+    "img": "/img/category/ciamis.jpg",
+    "color": "indigo",
+    "description": "Motif khas dari daerah Ciamis dengan sentuhan alam dan budaya Sunda."
+  },
+  {
+    "title": "Batik Garutan",
+    "img": "/img/category/garutan.jpg",
+    "color": "slate",
+    "description": "Batik dari Garut dengan warna-warna cerah dan motif yang bersifat naturalis."
+  },
+  {
+    "title": "Batik Priangan",
+    "img": "/img/category/priangan.jpg",
+    "color": "red",
+    "description": "Motif khas tatar Sunda dengan nuansa klasik dan warna lembut."
+  },
+  {
+    "title": "Batik Sekar",
+    "img": "/img/category/sekar.jpg",
+    "color": "red",
+    "description": "Motif bunga yang menggambarkan keindahan, kesegaran, dan kelembutan jiwa."
+  },
+  {
+    "title": "Batik Sidoluhur",
+    "img": "/img/category/sidoluhur.jpg",
+    "color": "slate",
+    "description": "Motif keraton yang biasa dipakai pengantin, melambangkan keluhuran dan kehormatan."
+  },
+  {
+    "title": "Batik Sidomukti",
+    "img": "/img/category/sidomukti.jpg",
+    "color": "amber",
+    "description": "Melambangkan harapan kehidupan yang makmur, biasa dipakai dalam pernikahan adat Jawa."
+  },
+  {
+    "title": "Batik Sogan",
+    "img": "/img/category/sogan.jpg",
+    "color": "slate",
+    "description": "Motif tradisional dengan dominasi warna cokelat kehitaman yang anggun dan klasik."
+  },
+  {
+    "title": "Batik Tambal",
+    "img": "/img/category/tambal.jpg",
+    "color": "amber",
+    "description": "Motif tambal-tambalan yang dipercaya membawa penyembuhan dan perlindungan."
+  }
+]

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-const API_URL = process.env.API_ROUTE || 'http://localhost:8081/api';
+const API_URL =
+  process.env.NEXT_PUBLIC_API_ROUTE || 'http://localhost:8081/api';
 
 // Create axios instance
 const axiosInstance = axios.create({
@@ -16,7 +17,7 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token'); // or get from auth store
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `${token}`;
     }
     return config;
   },
