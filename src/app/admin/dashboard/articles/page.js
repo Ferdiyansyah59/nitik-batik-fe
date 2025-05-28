@@ -10,6 +10,7 @@ import ImageUploadField from '@/components/dashboard/ImageUploadField';
 import { useToast } from '@/components/ui/Toast';
 import TiptapEditor from '@/components/micro/TiptapEditor';
 import EditorDecoupledWrapper from '@/components/micro/CKEditorDecoupledWrapper';
+import Link from 'next/link';
 
 // Dynamic import FormModal to avoid SSR issues with TiptapEditor
 const FormModal = dynamic(
@@ -23,7 +24,14 @@ const FormField = dynamic(
 );
 
 export default function AdminArticlesPage() {
-  const { articles, loading, fetchArticles } = useArticleStore();
+  const {
+    articles,
+    loading,
+    fetchArticles,
+    createArticle,
+    updateArticle,
+    deleteArticle,
+  } = useArticleStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,15 +44,15 @@ export default function AdminArticlesPage() {
     imageUrl: '',
   });
 
-  const API_ENDPOINT = 'http://localhost:8081';
-
   // Configure axios defaults
   useEffect(() => {
     // Set default headers if needed
     const token = localStorage.getItem('token'); // or get from your auth store
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axios.defaults.headers.common['Authorization'] = `${token}`;
     }
+
+    console.log(process.env.NEXT_PUBLIC_APP_URL);
   }, []);
 
   useEffect(() => {
@@ -63,7 +71,7 @@ export default function AdminArticlesPage() {
               src={
                 item.imageUrl.startsWith('http')
                   ? item.imageUrl
-                  : `${API_ENDPOINT}${item.imageUrl}`
+                  : `${process.env.NEXT_PUBLIC_API_URL}${item.imageUrl}`
               }
               alt={value}
               className="w-10 h-10 rounded object-cover mr-3"
@@ -76,6 +84,16 @@ export default function AdminArticlesPage() {
     {
       key: 'slug',
       label: 'Slug',
+      render: (value) => (
+        <Link
+          className="underline text-blue-800"
+          target="_blank"
+          rel="noopener noreferrer"
+          href={`${process.env.NEXT_PUBLIC_APP_URL}/articles/${value}`}
+        >
+          {value}
+        </Link>
+      ),
     },
     {
       key: 'created_At',
@@ -90,15 +108,11 @@ export default function AdminArticlesPage() {
     setIsLoading(true);
 
     try {
-      const endpoint = editingArticle
-        ? `${API_ENDPOINT}/api/articles/${editingArticle.id}`
-        : `${API_ENDPOINT}/api/articles`;
-
       const response = editingArticle
-        ? await axios.put(endpoint, formData)
-        : await axios.post(endpoint, formData);
+        ? await updateArticle(editingArticle.id, formData)
+        : await createArticle(formData);
 
-      if (response.status === 200 || response.status === 201) {
+      if (response || response.status === 200 || response.status === 201) {
         // Show success message
         toast.success(
           editingArticle
@@ -151,9 +165,7 @@ export default function AdminArticlesPage() {
   const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this article?')) {
       try {
-        const response = await axios.delete(
-          `${API_ENDPOINT}/api/articles/${id}`,
-        );
+        const response = await deleteArticle(id);
 
         if (response.status === 200) {
           toast.success('Article deleted successfully!');
