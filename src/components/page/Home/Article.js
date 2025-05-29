@@ -1,60 +1,58 @@
-import SectionSubtitle from "@/components/micro/SectionSubtitle";
-import Link from "next/link";
+'use client';
+import SectionSubtitle from '@/components/micro/SectionSubtitle';
+import useArticleStore from '@/store/articleStore';
+import Link from 'next/link';
+import { useEffect } from 'react';
 
 function Article() {
-  const data = [
-    {
-      title: "Pelestarian Batik Nusantara",
-      img: "/img/category/bali.png",
-      excerpt:
-        "of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also",
-    },
-    {
-      title: "Batik Menjadi Komoditas Idnoesia Raya Merdeka Merdeka",
-      img: "/img/category/kraton.png",
-      excerpt:
-        "of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also",
-    },
-    {
-      title: "Batik Betawi Adalah Dari Jakarta",
-      img: "/img/category/betawi.png",
-      excerpt:
-        "of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also",
-    },
-    {
-      title: "Batik Pekalongan Asal Pekalongan",
-      img: "/img/category/pekalongan.png",
-      excerpt:
-        "of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also",
-    },
-  ];
+  const { articles, fetchLatestArticles, loading, error } = useArticleStore();
+
+  useEffect(() => {
+    fetchLatestArticles();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <section className="mx-40 my-20">
-      <div className="flex justify-between">
+    <section className="container mx-auto px-4 my-20">
+      <div className="flex justify-between items-center mb-8">
         <SectionSubtitle title="Sesuatu Tentang Batik Kita" />
-        <Link href="/" className="underline text-primary">
+        <Link
+          href="/articles"
+          className="text-indigo-600 hover:text-indigo-800 transition-colors text-sm font-medium"
+        >
           Lihat Semua
         </Link>
       </div>
-      <div className="grid grid-cols-4 gap-5 mt-3">
-        {data.map((item, idx) => (
+
+      {/* ✅ 5 kolom dalam 1 baris */}
+      <div className="grid grid-cols-5 gap-6">
+        {articles.map((item, idx) => (
           <div
             key={idx}
-            className="bg-[#FFF8E7] border-2 border-[#ece3ca] gap-2 rounded-md"
+            className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border"
           >
+            {/* Image */}
             <div
+              className="h-32 bg-cover bg-center"
               style={{
-                backgroundImage: `url(${item.img})`,
+                backgroundImage: `url(${process.env.NEXT_PUBLIC_API_URL + item.imageUrl})`,
               }}
-              className="h-40 w-full"
-            ></div>
-            <div className="p-5 flex flex-col justify-between">
-              <div>
-                <h1 className="font-semibold">{item.title}</h1>
-                <p className="text-sm">{item.excerpt}</p>
-              </div>
-              <Link className="underline text-sm mt-2" href="/">
+            />
+
+            {/* Content */}
+            <div className="p-4">
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-primary transition-colors text-sm">
+                {item.title}
+              </h3>
+              <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                {item.excerpt}
+              </p>
+
+              <Link
+                href={`/articles/${item.slug}`}
+                className="text-xs text-primary hover:underline font-medium"
+              >
                 Baca Selengkapnya
               </Link>
             </div>

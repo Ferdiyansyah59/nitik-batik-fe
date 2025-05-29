@@ -80,7 +80,7 @@ function CardArticle() {
                     <div className="h-48 md:h-full relative">
                       {article.imageUrl ? (
                         <img
-                          src={`http://localhost:8081${article.imageUrl}`}
+                          src={`${process.env.NEXT_PUBLIC_API_URL + article.imageUrl}`}
                           alt={article.title}
                           className="object-cover w-full h-full"
                         />

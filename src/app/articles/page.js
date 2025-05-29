@@ -1,7 +1,7 @@
-import CardArticle from "@/components/page/Article/Card";
+import CardArticle from '@/components/page/Article/Card';
 
 function Article() {
-    return ( <CardArticle /> );
+  return <CardArticle />;
 }
 
 export default Article;

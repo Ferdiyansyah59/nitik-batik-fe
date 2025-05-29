@@ -74,6 +74,32 @@ const useArticleStore = create((set) => ({
     }
   },
 
+  // Get Latest Article
+  fetchLatestArticles: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await axiosInstance.get('/latest-articles');
+      // console.log('INI', res.data.data);
+      if (res.data.status) {
+        set({
+          articles: res.data.data,
+          loading: false,
+        });
+      } else {
+        throw new Error(res.data.message);
+      }
+    } catch (err) {
+      set({
+        error:
+          err.response?.data?.message ||
+          err.message ||
+          'Failed to fetch latest articles',
+        loading: false,
+      });
+      console.log('Error fetching articles: ', err);
+    }
+  },
+
   // Get article by slug
   fetchArticleBySlug: async (slug) => {
     set({ loading: true, error: null, article: null });
