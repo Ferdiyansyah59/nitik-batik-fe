@@ -1,77 +1,154 @@
+// src/app/penjual/dashboard/page.js
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
+import { useAuth } from '@/hooks/useAuth';
+import { useStoreData } from '@/hooks/useStore';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 export default function SellerDashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, needsToCreateStore } = useAuth();
+  const { store, hasStore, loading: storeLoading } = useStoreData();
+
+  // ✅ Loading state untuk menunggu rehydration
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
 
   useEffect(() => {
-    // Check authentication
-    if (!isAuthenticated() || user?.role !== 'penjual') {
-      router.push('/login');
+    // ✅ Delay untuk menunggu zustand rehydration
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      setHasCheckedAuth(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // ✅ Check auth dan store status setelah loading selesai
+    if (!isLoading && hasCheckedAuth) {
+      if (!isAuthenticated() || user?.role !== 'penjual') {
+        router.push('/login');
+        return;
+      }
+
+      // ✅ Redirect ke halaman buat toko jika belum punya toko
+      if (needsToCreateStore()) {
+        router.push('/penjual/store');
+        return;
+      }
     }
-  }, [isAuthenticated, user, router]);
+  }, [
+    isLoading,
+    hasCheckedAuth,
+    isAuthenticated,
+    user,
+    needsToCreateStore,
+    router,
+  ]);
+
+  // ✅ Show loading saat menunggu rehydration
+  if (isLoading || storeLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Show loading jika masih checking auth
+  if (!hasCheckedAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse bg-gray-200 h-12 w-48 rounded mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Redirect jika user belum punya toko
+  if (needsToCreateStore()) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Redirecting to store creation...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Mock data untuk dashboard
   const stats = [
     {
-      title: 'Total Users',
-      value: '1,234',
-      change: '+12%',
-      icon: '👥',
+      title: 'Total Produk',
+      value: '24',
+      change: '+3',
+      icon: '🛍️',
       color: 'blue',
     },
     {
-      title: 'Total Articles',
-      value: '567',
-      change: '+23%',
-      icon: '📝',
+      title: 'Pesanan Bulan Ini',
+      value: '45',
+      change: '+12',
+      icon: '📦',
       color: 'green',
     },
     {
-      title: 'Total Products',
-      value: '890',
-      change: '+8%',
-      icon: '🛍️',
+      title: 'Total Pelanggan',
+      value: '128',
+      change: '+8',
+      icon: '👥',
       color: 'purple',
     },
     {
-      title: 'Total Revenue',
-      value: 'Rp 45.6M',
+      title: 'Pendapatan Bulan Ini',
+      value: 'Rp 12.5M',
       change: '+15%',
       icon: '💰',
       color: 'yellow',
     },
   ];
 
-  const recentActivities = [
+  const recentOrders = [
     {
       id: 1,
-      user: 'John Doe',
-      action: 'created a new article',
-      time: '2 hours ago',
+      customer: 'Budi Santoso',
+      product: 'Kemeja Batik Parang',
+      amount: 'Rp 250.000',
+      status: 'Pending',
+      time: '2 jam lalu',
     },
     {
       id: 2,
-      user: 'Jane Smith',
-      action: 'updated product information',
-      time: '4 hours ago',
+      customer: 'Siti Nurhaliza',
+      product: 'Blus Batik Kawung',
+      amount: 'Rp 180.000',
+      status: 'Processing',
+      time: '4 jam lalu',
     },
     {
       id: 3,
-      user: 'Mike Johnson',
-      action: 'registered as a new seller',
-      time: '6 hours ago',
+      customer: 'Ahmad Wijaya',
+      product: 'Kain Batik Solo',
+      amount: 'Rp 450.000',
+      status: 'Shipped',
+      time: '6 jam lalu',
     },
     {
       id: 4,
-      user: 'Sarah Williams',
-      action: 'placed a new order',
-      time: '8 hours ago',
+      customer: 'Maya Sari',
+      product: 'Rok Batik Modern',
+      amount: 'Rp 320.000',
+      status: 'Delivered',
+      time: '1 hari lalu',
     },
   ];
 
@@ -82,17 +159,52 @@ export default function SellerDashboardPage() {
     yellow: 'bg-yellow-100 text-yellow-600',
   };
 
+  const statusColors = {
+    Pending: 'bg-yellow-100 text-yellow-800',
+    Processing: 'bg-blue-100 text-blue-800',
+    Shipped: 'bg-purple-100 text-purple-800',
+    Delivered: 'bg-green-100 text-green-800',
+  };
+
   return (
     <DashboardLayout role="penjual">
       <div className="space-y-6">
-        {/* Welcome Section */}
+        {/* ✅ Welcome Section dengan info toko */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Welcome back, {user?.name}!
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Here's what's happening with your platform today.
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Selamat datang, {user?.name}!
+              </h1>
+              {store && (
+                <div className="mt-2">
+                  <p className="text-lg text-gray-700 font-medium">
+                    {store.name}
+                  </p>
+                  <p className="text-gray-600">{store.description}</p>
+                  <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
+                    <span>📱 {store.whatsapp}</span>
+                    <span>📍 {store.alamat}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* ✅ Store Actions */}
+            <div className="flex space-x-2">
+              <button
+                onClick={() => router.push('/store')}
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 text-sm"
+              >
+                Lihat Toko
+              </button>
+              <button
+                onClick={() => router.push('/penjual/dashboard/store/edit')}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 text-sm"
+              >
+                Edit Toko
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -107,7 +219,7 @@ export default function SellerDashboardPage() {
                     <span className="text-green-600 font-medium">
                       {stat.change}
                     </span>{' '}
-                    from last month
+                    dari bulan lalu
                   </p>
                 </div>
                 <div className={`p-3 rounded-full ${colorMap[stat.color]}`}>
@@ -120,29 +232,41 @@ export default function SellerDashboardPage() {
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Activities */}
+          {/* Recent Orders */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Recent Activities</h2>
+              <h2 className="text-lg font-semibold">Pesanan Terbaru</h2>
             </div>
             <div className="p-6">
               <div className="space-y-4">
-                {recentActivities.map((activity) => (
+                {recentOrders.map((order) => (
                   <div
-                    key={activity.id}
+                    key={order.id}
                     className="flex items-center justify-between py-3 border-b last:border-0"
                   >
-                    <div>
-                      <p className="text-sm">
-                        <span className="font-medium">{activity.user}</span>{' '}
-                        {activity.action}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {activity.time}
-                      </p>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{order.customer}</p>
+                      <p className="text-xs text-gray-500">{order.product}</p>
+                      <p className="text-xs text-gray-400 mt-1">{order.time}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">{order.amount}</p>
+                      <span
+                        className={`inline-block px-2 py-1 text-xs rounded-full ${statusColors[order.status]}`}
+                      >
+                        {order.status}
+                      </span>
                     </div>
                   </div>
                 ))}
+              </div>
+              <div className="mt-4">
+                <button
+                  onClick={() => router.push('/penjual/dashboard/orders')}
+                  className="w-full text-center text-sm text-primary hover:text-primary/80"
+                >
+                  Lihat Semua Pesanan →
+                </button>
               </div>
             </div>
           </div>
@@ -150,48 +274,52 @@ export default function SellerDashboardPage() {
           {/* Quick Actions */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Quick Actions</h2>
+              <h2 className="text-lg font-semibold">Aksi Cepat</h2>
             </div>
             <div className="p-6">
               <div className="grid grid-cols-2 gap-4">
                 <button
-                  onClick={() => router.push('/penjual/dashboard/articles')}
+                  onClick={() => router.push('/penjual/dashboard/products/add')}
                   className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <span className="text-2xl">📝</span>
-                  <p className="mt-2 text-sm font-medium">Add Article</p>
+                  <span className="text-2xl">➕</span>
+                  <p className="mt-2 text-sm font-medium">Tambah Produk</p>
                 </button>
                 <button
-                  onClick={() => router.push('/penjual/dashboard/users')}
+                  onClick={() => router.push('/penjual/dashboard/orders')}
                   className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <span className="text-2xl">👤</span>
-                  <p className="mt-2 text-sm font-medium">Add User</p>
+                  <span className="text-2xl">📦</span>
+                  <p className="mt-2 text-sm font-medium">Kelola Pesanan</p>
                 </button>
                 <button
-                  onClick={() => router.push('/penjual/dashboard/categories')}
+                  onClick={() => router.push('/penjual/dashboard/customers')}
                   className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <span className="text-2xl">🏷️</span>
-                  <p className="mt-2 text-sm font-medium">Add Category</p>
+                  <span className="text-2xl">👥</span>
+                  <p className="mt-2 text-sm font-medium">Data Pelanggan</p>
                 </button>
                 <button
-                  onClick={() => router.push('/penjual/dashboard/reports')}
+                  onClick={() => router.push('/penjual/dashboard/analytics')}
                   className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <span className="text-2xl">📊</span>
-                  <p className="mt-2 text-sm font-medium">View Reports</p>
+                  <p className="mt-2 text-sm font-medium">Lihat Analitik</p>
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Chart Placeholder */}
+        {/* ✅ Store Performance Chart */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Sales Overview</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            Performa Toko - {store?.name}
+          </h2>
           <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
-            <p className="text-gray-500">Chart visualization would go here</p>
+            <p className="text-gray-500">
+              Chart visualisasi performa toko akan ditampilkan di sini
+            </p>
           </div>
         </div>
       </div>
