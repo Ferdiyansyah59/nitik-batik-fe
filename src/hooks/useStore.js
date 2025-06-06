@@ -16,6 +16,7 @@ export function useStoreHooks() {
     getCurrentStore,
     hasStore: storeHasStore,
     fetchStoreByUserId,
+    fetchStoreByID,
     refreshStore,
   } = useStoreStore();
 
@@ -111,6 +112,15 @@ export function useStoreHooks() {
     }
   }, [fetchStoreByUserId, user]);
 
+  const useStoreByID = useCallback(async () => {
+    console.log(authStore.id);
+    try {
+      await fetchStoreByID(authStore.id);
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
   // ✅ Clear all errors
   const clearAllErrors = useCallback(() => {
     clearError();
@@ -151,6 +161,7 @@ export function useStoreHooks() {
     currentStore,
     hasStore,
     needsToCreateStore,
+    useStoreByID,
 
     // Loading states
     loading,

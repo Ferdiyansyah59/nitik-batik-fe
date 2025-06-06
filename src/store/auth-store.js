@@ -7,6 +7,30 @@ import axios from 'axios';
 // API URL
 const API_URL = process.env.API_ROUTE || 'http://localhost:8081/api';
 
+// ✅ Token validation helper dengan auto-logout
+const isTokenValid = (token) => {
+  if (!token) return false;
+
+  try {
+    const decoded = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    const isValid = decoded.exp > currentTime;
+
+    // ✅ Auto logout jika token expired
+    if (!isValid) {
+      console.log('🔒 Token expired, auto-logout');
+      useAuthStore.getState().logout();
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.log('🔒 Invalid token, auto-logout');
+    useAuthStore.getState().logout();
+    return false;
+  }
+};
+
 // Create auth store dengan persistensi
 export const useAuthStore = create(
   persist(
@@ -18,12 +42,11 @@ export const useAuthStore = create(
       isLoadingStore: false,
       error: null,
 
-      // Login action
+      // ✅ Enhanced login with better error handling
       login: async (email, password) => {
         try {
           set({ isLoading: true, error: null });
 
-          // Call API
           const response = await axios.post(`${API_URL}/login`, {
             email,
             password,
@@ -31,7 +54,11 @@ export const useAuthStore = create(
 
           const token = response.data.data.token;
           const user = response.data.data;
-          console.log('User logged in:', user);
+
+          // ✅ Validate token before storing
+          if (!isTokenValid(token)) {
+            throw new Error('Received invalid token from server');
+          }
 
           // Set auth header untuk requests berikutnya
           axios.defaults.headers.common['Authorization'] = `${token}`;
@@ -61,46 +88,95 @@ export const useAuthStore = create(
         }
       },
 
-      // ✅ DIPERBAIKI: Fetch store data menggunakan endpoint yang benar
+      // ✅ Enhanced logout dengan complete cleanup
+      logout: () => {
+        console.log('🔒 Logging out user');
+
+        // Clear axios auth header
+        delete axios.defaults.headers.common['Authorization'];
+
+        // Clear auth state
+        set({
+          user: null,
+          token: null,
+          store: null,
+          error: null,
+          isLoadingStore: false,
+        });
+
+        // ✅ Force clear cookies dan localStorage
+        if (typeof window !== 'undefined') {
+          // Clear cookies
+          document.cookie =
+            'auth-storage=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+
+          // Clear localStorage sebagai backup
+          localStorage.removeItem('auth-storage');
+          localStorage.removeItem('token');
+        }
+      },
+
+      // ✅ Enhanced authentication check dengan auto-logout
+      isAuthenticated: () => {
+        const { token, user } = get();
+
+        if (!token || !user) {
+          return false;
+        }
+
+        // ✅ Validate token expiry dengan auto-logout
+        return isTokenValid(token);
+      },
+
+      // ✅ Setup auto token validation check
+      startTokenValidationTimer: () => {
+        // Check token validity every minute
+        const interval = setInterval(() => {
+          const { token } = get();
+          if (token && !isTokenValid(token)) {
+            clearInterval(interval);
+          }
+        }, 60000); // Check setiap 1 menit
+
+        return interval;
+      },
+
+      // ... rest of the store methods remain the same
       fetchUserStore: async (userId) => {
         set({ isLoadingStore: true });
 
         try {
-          console.log('Fetching store for user ID:', userId);
-
-          // ✅ Gunakan endpoint yang sudah ada di backend
           const response = await axios.get(`${API_URL}/store/user/${userId}`);
 
           if (response.data.status && response.data.data) {
             const storeData = response.data.data;
-            console.log('Store data found:', storeData);
-
             set({ store: storeData, isLoadingStore: false });
             return storeData;
           } else {
-            // Tidak ada toko untuk user ini (normal untuk user baru)
-            console.log('No store found for user ID:', userId);
             set({ store: null, isLoadingStore: false });
             return null;
           }
         } catch (error) {
-          console.log('Error fetching store data:', error);
-
-          // ✅ Jika error 404 (store not found), itu normal untuk user baru
           if (error.response?.status === 404) {
-            console.log('User does not have a store yet (404 response)');
             set({ store: null, isLoadingStore: false });
             return null;
           }
 
-          // Error lain (connection, server error, etc.)
-          console.error('Unexpected error fetching store:', error);
-          set({ store: null, isLoadingStore: false });
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            'Failed to fetch store';
+
+          set({
+            error: errorMessage,
+            isLoadingStore: false,
+            store: null,
+          });
+
           return null;
         }
       },
 
-      // Register action
       register: async (name, email, password, role = 'penjual') => {
         try {
           set({ isLoading: true, error: null });
@@ -115,10 +191,15 @@ export const useAuthStore = create(
           const token = response.data.data.token;
           const user = response.data.data;
 
+          // ✅ Validate token before storing
+          if (!isTokenValid(token)) {
+            throw new Error('Received invalid token from server');
+          }
+
           set({
             user,
             token,
-            store: null, // Store null untuk user baru
+            store: null,
             isLoading: false,
           });
 
@@ -136,7 +217,6 @@ export const useAuthStore = create(
         }
       },
 
-      // Method untuk update data store setelah user membuat toko
       updateStore: async () => {
         const { user, token } = get();
         if (!user || user.role !== 'penjual' || !token) {
@@ -145,48 +225,18 @@ export const useAuthStore = create(
         return await get().fetchUserStore(user.id);
       },
 
-      // Method untuk set store data (digunakan setelah create store)
       setStore: (storeData) => {
         set({ store: storeData });
       },
 
-      // Method untuk clear data store
       clearStore: () => {
         set({ store: null });
       },
 
-      // Logout action
-      logout: () => {
-        delete axios.defaults.headers.common['Authorization'];
-        set({
-          user: null,
-          token: null,
-          store: null,
-          error: null,
-          isLoadingStore: false,
-        });
-      },
-
-      // Clear error
       clearError: () => {
         set({ error: null });
       },
 
-      // Helper untuk cek autentikasi
-      isAuthenticated: () => {
-        const token = get().token;
-        if (!token) return false;
-
-        try {
-          const decoded = jwtDecode(token);
-          const currentTime = Date.now() / 1000;
-          return decoded.exp > currentTime;
-        } catch {
-          return false;
-        }
-      },
-
-      // Helper untuk cek role
       isAdmin: () => {
         return get().user?.role === 'admin';
       },
@@ -199,7 +249,6 @@ export const useAuthStore = create(
         return get().user?.role === 'pembeli';
       },
 
-      // Helper untuk cek apakah user punya toko
       hasStore: () => {
         const { user, store } = get();
         return (
@@ -207,12 +256,10 @@ export const useAuthStore = create(
         );
       },
 
-      // Helper untuk get store data
       getStore: () => {
         return get().store;
       },
 
-      // Helper untuk cek loading state
       isStoreLoading: () => {
         return get().isLoadingStore;
       },
@@ -241,10 +288,62 @@ export const useAuthStore = create(
   ),
 );
 
-// Set auth header dari storage saat aplikasi dimuat
+// ✅ Setup axios interceptor untuk handle 401 responses
+let isSettingUpInterceptor = false;
+
+export const setupAxiosInterceptor = () => {
+  if (isSettingUpInterceptor) return;
+  isSettingUpInterceptor = true;
+
+  // Request interceptor
+  axios.interceptors.request.use(
+    (config) => {
+      const { token } = useAuthStore.getState();
+      if (token && isTokenValid(token)) {
+        config.headers.Authorization = `${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    },
+  );
+
+  // Response interceptor untuk handle 401
+  axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        console.log('🔒 Received 401, logging out');
+        useAuthStore.getState().logout();
+
+        // Redirect to login if not already there
+        if (
+          typeof window !== 'undefined' &&
+          !window.location.pathname.includes('/login')
+        ) {
+          window.location.href = '/login';
+        }
+      }
+      return Promise.reject(error);
+    },
+  );
+};
+
+// ✅ Initialize auth dan setup interceptor
 if (typeof window !== 'undefined') {
+  // Setup interceptor
+  setupAxiosInterceptor();
+
+  // Set auth header dari storage saat aplikasi dimuat
   const token = useAuthStore.getState().token;
-  if (token) {
+  if (token && isTokenValid(token)) {
     axios.defaults.headers.common['Authorization'] = `${token}`;
+
+    // Start token validation timer
+    useAuthStore.getState().startTokenValidationTimer();
+  } else if (token) {
+    // Token ada tapi invalid, logout
+    useAuthStore.getState().logout();
   }
 }

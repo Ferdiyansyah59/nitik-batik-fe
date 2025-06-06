@@ -104,7 +104,11 @@ const useStoreStore = create((set, get) => ({
   updateStore: async (storeId, storeData) => {
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.put(`/store/${storeId}`, storeData);
+      const response = await axiosInstance.put(`/store/${storeId}`, storeData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       if (response.data.status) {
         const updatedStore = response.data.data;
@@ -158,6 +162,29 @@ const useStoreStore = create((set, get) => ({
       });
 
       throw new Error(errorMessage);
+    }
+  },
+
+  // Fetch Store with ID For edit
+  fetchStoreByID: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const rest = await axiosInstance.get(`/store/${id}`);
+
+      if (rest.data.status && rest.data.data) {
+        const storeData = rest.data.data;
+        console.log(storeData);
+        set({ store: storeData, loading: false });
+      } else {
+        console.log('API Fetching success but no store data');
+        set({ store: null, loading: false });
+      }
+    } catch (err) {
+      console.log('🔍 Store fetch error details:', {
+        status: err.response?.status,
+        message: err.response?.data?.message,
+        fullError: err,
+      });
     }
   },
 

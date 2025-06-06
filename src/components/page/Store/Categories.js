@@ -1,49 +1,56 @@
+'use client';
 import Description from '@/components/micro/Description';
 import SectionSubtitle from '@/components/micro/SectionSubtitle';
+import { useProductCategories } from '@/hooks/useProductCategories';
+import Link from 'next/link';
+import { useEffect } from 'react';
 
 function Categories() {
+  const { productCategories, fetchProductCategories } = useProductCategories();
+
+  useEffect(() => {
+    fetchProductCategories();
+  }, [fetchProductCategories]);
+
+  useEffect(() => {
+    console.log('Ini kategori', productCategories);
+  });
   const data = [
     {
       name: 'Kemeja Batik',
       img: 'kemeja.png',
       bgColor: 'from-amber-200 to-amber-100',
       borderColor: 'border-amber-400',
-      hoverColor: 'hover:bg-amber-600',
     },
     {
       name: 'Blus Batik',
       img: 'blus.png',
       bgColor: 'from-rose-200 to-rose-100',
       borderColor: 'border-rose-400',
-      hoverColor: 'hover:bg-rose-600',
     },
     {
       name: 'Kaos Batik',
       img: 'kaos.png',
       bgColor: 'from-teal-200 to-teal-100',
       borderColor: 'border-teal-400',
-      hoverColor: 'hover:bg-teal-600',
     },
     {
       name: 'Celana Batik',
       img: 'celana.png',
       bgColor: 'from-indigo-200 to-indigo-100',
       borderColor: 'border-indigo-400',
-      hoverColor: 'hover:bg-indigo-600',
     },
     {
       name: 'Rok Batik',
       img: 'rok.png',
       bgColor: 'from-fuchsia-200 to-fuchsia-100',
       borderColor: 'border-fuchsia-400',
-      hoverColor: 'hover:bg-fuchsia-600',
     },
     {
       name: 'Kain Batik',
       img: 'kain.png',
       bgColor: 'from-amber-300 to-amber-200',
       borderColor: 'border-amber-500',
-      hoverColor: 'hover:bg-amber-600',
     },
   ];
 
@@ -55,10 +62,10 @@ function Categories() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-        {data.map((item, idx) => (
+        {productCategories.map((item, idx) => (
           <div
             className="group cursor-pointer transition-all duration-300 transform hover:-translate-y-2"
-            key={idx}
+            key={item.id}
           >
             <div
               className={`
@@ -66,9 +73,9 @@ function Categories() {
               overflow-hidden
               rounded-2xl
               shadow-md 
-              border-2 ${item.borderColor}
+              border-2 ${data[idx].borderColor}
               h-48 md:h-56
-              bg-gradient-to-b ${item.bgColor}
+              bg-gradient-to-b ${data[idx].bgColor}
               flex items-center justify-center
               transition-all duration-300
               group-hover:shadow-xl
@@ -87,8 +94,8 @@ function Categories() {
               <div className="relative z-10 h-32 md:h-40 w-32 md:w-40 flex items-center justify-center transition-all duration-300 transform group-hover:scale-105 group-hover:translate-y-[-10px]">
                 <img
                   className="h-full w-auto object-contain drop-shadow-md"
-                  src={`/img/store_categories/${item.img}`}
-                  alt={item.name}
+                  src={`/img/store_categories/${data[idx].img}`}
+                  alt={item.category_name}
                 />
               </div>
 
@@ -104,7 +111,7 @@ function Categories() {
                 group-hover:translate-y-0
               `}
               >
-                <h3 className="text-center">{item.name}</h3>
+                <h3 className="text-center">{item.category_name}</h3>
               </div>
             </div>
 
@@ -116,11 +123,11 @@ function Categories() {
               group-hover:text-amber-800
             `}
             >
-              {item.name}
+              {item.category_name}
             </h2>
 
             {/* Shop Now Button */}
-            <div className="text-center mt-1">
+            <Link className="text-center mt-1" href={item.slug}>
               <span
                 className={`
                 text-xs font-medium text-gray-500
@@ -130,7 +137,7 @@ function Categories() {
               >
                 Lihat Koleksi →
               </span>
-            </div>
+            </Link>
           </div>
         ))}
       </div>

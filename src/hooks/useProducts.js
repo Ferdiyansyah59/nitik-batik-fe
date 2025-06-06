@@ -28,6 +28,7 @@ export function useProducts(options = {}) {
     deleteProduct: deleteProductFromStore,
     clearError,
     clearProducts,
+    fetchLatestProduct,
   } = useProductStore();
 
   // Local state
@@ -166,6 +167,14 @@ export function useProducts(options = {}) {
     };
   }, [safeProducts]);
 
+  const getLatestProduct = useCallback(async () => {
+    try {
+      await fetchLatestProduct();
+    } catch (error) {
+      console.log('useProducts: Error fetching latest product', error);
+    }
+  }, [fetchLatestProduct]);
+
   // ✅ Format price helper
   const formatPrice = useCallback((price) => {
     return new Intl.NumberFormat('id-ID', {
@@ -196,6 +205,7 @@ export function useProducts(options = {}) {
     hasError,
     canManageProducts,
     deleteLoading,
+    getLatestProduct,
 
     // ✅ Pagination states
     hasNextPage,
@@ -220,8 +230,14 @@ export function useProducts(options = {}) {
 
 // ✅ Hook untuk single product
 export function useProduct(initialSlug = null) {
-  const { product, loading, error, fetchProductBySlug, clearError } =
-    useProductStore();
+  const {
+    product,
+    loading,
+    error,
+    fetchProductBySlug,
+    fetchPublicProductBySlug,
+    clearError,
+  } = useProductStore();
 
   // ✅ fetchProduct yang menerima slug sebagai parameter
   const fetchProduct = useCallback(
@@ -248,6 +264,30 @@ export function useProduct(initialSlug = null) {
     [fetchProductBySlug, initialSlug],
   );
 
+  const fetchPublicProduct = useCallback(
+    async (targetSlug) => {
+      const slugToUse = targetSlug || initialSlug;
+
+      if (!slugToUse) {
+        console.warn('useProduct: slug is required');
+        return null;
+      }
+
+      try {
+        await fetchPublicProductBySlug(slugToUse);
+
+        // ✅ Akses state terbaru dari store
+        const currentProduct = useProductStore.getState().product;
+        console.log('Ini kuren', currentProduct);
+        return currentProduct;
+      } catch (error) {
+        console.error('useProduct: Error fetching product:', error);
+        throw error;
+      }
+    },
+    [fetchPublicProductBySlug, initialSlug],
+  );
+
   // Auto-fetch jika ada initialSlug
   useEffect(() => {
     if (initialSlug) {
@@ -259,7 +299,8 @@ export function useProduct(initialSlug = null) {
     product,
     loading,
     error,
-    fetchProduct, // ✅ Sekarang bisa dipanggil dengan fetchProduct(slug)
+    fetchProduct,
+    fetchPublicProduct,
     clearError,
     hasProduct: !!product,
   };

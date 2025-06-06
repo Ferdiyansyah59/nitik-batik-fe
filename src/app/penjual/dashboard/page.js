@@ -27,6 +27,7 @@ export default function SellerDashboardPage() {
   }, []);
 
   useEffect(() => {
+    // console.log('inI TOKO', store.id);
     // ✅ Check auth dan store status setelah loading selesai
     if (!isLoading && hasCheckedAuth) {
       if (!isAuthenticated() || user?.role !== 'penjual') {

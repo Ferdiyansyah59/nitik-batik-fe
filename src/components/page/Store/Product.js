@@ -1,8 +1,10 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import SectionSubtitle from '@/components/micro/SectionSubtitle';
 import Description from '@/components/micro/Description';
 import { useRouter } from 'next/navigation';
+import { useProducts } from '@/hooks/useProducts';
+import Link from 'next/link';
 
 // Format harga ke format Rupiah
 function formatRupiah(angka) {
@@ -34,6 +36,13 @@ function RatingStars({ rating = 4.5 }) {
 
 function Product() {
   const router = useRouter();
+  const { getLatestProduct, products } = useProducts();
+
+  useEffect(() => {
+    getLatestProduct();
+  }, [getLatestProduct]);
+
+  console.log('Ini produk kita yaa ges ', products);
   const data = [
     {
       name: 'Kemeja Batik Pria Motif Parang',
@@ -41,6 +50,7 @@ function Product() {
       harga: '1000000',
       toko: 'Batik Sentosa',
       rating: 4.8,
+      category: 'kemeja-batik',
     },
     {
       name: 'Blus Batik Wanita Modern',
@@ -48,6 +58,7 @@ function Product() {
       harga: '950000',
       toko: 'Batik Sentosa',
       rating: 4.7,
+      category: 'blus-batik',
     },
     {
       name: 'Kaos Batik Casual',
@@ -55,6 +66,7 @@ function Product() {
       harga: '450000',
       toko: 'Batik Sentosa',
       rating: 4.3,
+      category: 'kaos-batik',
     },
     {
       name: 'Celana Batik Premium',
@@ -62,6 +74,7 @@ function Product() {
       harga: '850000',
       toko: 'Batik Sentosa',
       rating: 4.9,
+      category: 'celana-batik',
     },
     {
       name: 'Rok Batik Lilit Modern',
@@ -70,6 +83,7 @@ function Product() {
       toko: 'Batik Sentosa',
       discount: 20,
       rating: 4.6,
+      category: 'rok-batik',
     },
     {
       name: 'Kain Batik Tulis Asli',
@@ -77,6 +91,7 @@ function Product() {
       harga: '2500000',
       toko: 'Batik Sentosa',
       rating: 5.0,
+      category: 'kain-batik',
     },
     {
       name: 'Kain Batik Cap Berkualitas',
@@ -84,6 +99,7 @@ function Product() {
       harga: '1200000',
       toko: 'Batik Nad',
       rating: 4.5,
+      category: 'kain-batik',
     },
     {
       name: 'Kain Batik Solo Premium',
@@ -91,8 +107,30 @@ function Product() {
       harga: '1800000',
       toko: 'Batik Nurdin',
       rating: 4.7,
+      category: 'kain-batik',
     },
   ];
+
+  const dataWarna = {
+    'kemeja-batik': {
+      bgColor: 'from-amber-200 to-amber-100',
+    },
+    'blus-batik': {
+      bgColor: 'from-rose-200 to-rose-100',
+    },
+    'kaos-batik': {
+      bgColor: 'from-teal-200 to-teal-100',
+    },
+    'celana-batik': {
+      bgColor: 'from-indigo-200 to-indigo-100',
+    },
+    'rok-batik': {
+      bgColor: 'from-fuchsia-200 to-fuchsia-100',
+    },
+    'kain-batik': {
+      bgColor: 'from-amber-300 to-amber-200',
+    },
+  };
 
   const handleDetail = () => {
     router.push('/store/detail-product');
@@ -106,7 +144,7 @@ function Product() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-        {data.map((item, idx) => (
+        {products.map((item, idx) => (
           <div
             key={idx}
             className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
@@ -115,19 +153,19 @@ function Product() {
             <div className="relative h-48 md:h-56 bg-gray-100 overflow-hidden">
               {/* Product Image */}
               <img
-                src={`/img/store_categories/${item.img}`}
+                src={`${process.env.NEXT_PUBLIC_API_URL + item.thumbnail}`}
                 alt={item.name}
                 className="w-full h-full object-contain object-center transform group-hover:scale-105 transition-transform duration-500"
               />
 
               {/* Hover Overlay with Buttons */}
               <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2">
-                <button
+                <Link
+                  href={`/store/detail-product/${item.slug}`}
                   className="bg-white text-gray-800 px-4 py-2 rounded-full text-sm font-medium hover:bg-amber-500 hover:text-white transition-colors duration-300"
-                  onClick={handleDetail}
                 >
                   Lihat Detail
-                </button>
+                </Link>
                 {/* <button className="bg-amber-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-amber-600 transition-colors duration-300">
                   + Keranjang
                 </button> */}
@@ -138,8 +176,14 @@ function Product() {
             <div className="p-4">
               {/* Shop Name */}
               <div className="flex justify-between items-center mb-1">
-                <p className="text-xs text-gray-500 font-medium">{item.toko}</p>
-                {/* <RatingStars rating={item.rating} /> */}
+                <p className="text-xs text-gray-500 font-medium">
+                  {item.store_name}
+                </p>
+                <div
+                  className={`bg-gradient-to-b ${dataWarna[item.category_slug].bgColor} px-2 py-1 rounded-sm`}
+                >
+                  <p className="text-xs">{item.category_name}</p>
+                </div>
               </div>
 
               {/* Product Name */}
@@ -149,20 +193,9 @@ function Product() {
 
               {/* Price */}
               <div className="mt-2">
-                {item.discount ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-amber-800 font-bold">
-                      {formatRupiah(item.harga * (1 - item.discount / 100))}
-                    </span>
-                    <span className="text-gray-400 text-sm line-through">
-                      {formatRupiah(item.harga)}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-amber-800 font-bold">
-                    {formatRupiah(item.harga)}
-                  </span>
-                )}
+                <span className="text-amber-800 font-bold">
+                  {formatRupiah(item.harga)}
+                </span>
               </div>
             </div>
           </div>

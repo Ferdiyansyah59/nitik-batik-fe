@@ -313,6 +313,115 @@ const useProductStore = create((set, get) => ({
     }
   },
 
+  // Public: fetch latest product
+  fetchLatestProduct: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await axiosInstance.get('/latest-products');
+      if (res.data.status) {
+        set({ loading: false, products: res.data.data });
+        console.log('Success fetching latest products ', res.data.data);
+      } else {
+        set({ loading: false, product: null });
+        console.log('Success fetching data but no data latest products');
+      }
+    } catch (error) {
+      console.error('Error fetching latest product product:', error);
+      set({
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          'Failed to delete product',
+        loading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Public: fetch all product
+  fetchAllPublicProduct: async (storeId, page = 1, limit = 12, search = '') => {
+    set({ loading: true, error: null });
+
+    try {
+      const params = {
+        page: page.toString(),
+        limit: limit.toString(),
+      };
+
+      if (search && search.trim()) {
+        params.search = search.trim();
+      }
+
+      const response = await axiosInstance.get(`/products`, {
+        params,
+        timeout: 15000, // 15 second timeout for this request
+      });
+
+      console.log('✅ Products API response:', response.data);
+
+      if (response.data && response.data.status) {
+        // ✅ PERBAIKAN: Pastikan products selalu array
+        const products = Array.isArray(response.data.data?.products)
+          ? response.data.data.products
+          : [];
+
+        const pagination = response.data.data?.pagination || {
+          page: 1,
+          limit: 12,
+          totalItems: 0,
+          totalPages: 0,
+        };
+
+        console.log('✅ Setting products:', products.length, 'items');
+
+        set({
+          products,
+          pagination,
+          loading: false,
+          error: null,
+        });
+      } else {
+        throw new Error(response.data?.message || 'Invalid response format');
+      }
+    } catch (error) {
+      console.error('❌ Error fetching products:', error);
+
+      set({
+        error: errorMessage,
+        loading: false,
+        products: [], // ✅ PERBAIKAN: Set ke empty array saat error
+      });
+    }
+  },
+  // Public: fetch product by slug
+  fetchPublicProductBySlug: async (slug) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axiosInstance.get(`/product/${slug}`);
+
+      // console.log('ini detail ', response.data.data.description);
+
+      if (response.data.status) {
+        set({
+          product: response.data.data,
+          loading: false,
+        });
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      set({
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch product',
+        loading: false,
+        product: null,
+      });
+    }
+  },
+
   // ✅ Clear products (useful for switching stores)
   clearProducts: () => {
     set({
