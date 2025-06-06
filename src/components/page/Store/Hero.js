@@ -29,7 +29,7 @@ function Hero() {
           </p>
 
           {/* Search Bar */}
-          <div className="relative mb-8 max-w-lg">
+          {/* <div className="relative mb-8 max-w-lg">
             <input
               type="text"
               placeholder="Cari batik yang kamu inginkan"
@@ -51,7 +51,7 @@ function Hero() {
                 />
               </svg>
             </button>
-          </div>
+          </div> */}
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4 mb-12">

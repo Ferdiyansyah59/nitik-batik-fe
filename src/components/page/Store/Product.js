@@ -204,9 +204,12 @@ function Product() {
 
       {/* "See More" Button */}
       <div className="text-center mt-8">
-        <button className="bg-amber-800 hover:bg-amber-900 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg">
+        <Link
+          href="/store/products"
+          className="bg-amber-800 hover:bg-amber-900 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 shadow-md hover:shadow-lg"
+        >
           Katalog Batik Lainnya
-        </button>
+        </Link>
       </div>
     </section>
   );

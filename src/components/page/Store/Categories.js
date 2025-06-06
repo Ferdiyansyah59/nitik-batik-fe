@@ -127,7 +127,10 @@ function Categories() {
             </h2>
 
             {/* Shop Now Button */}
-            <Link className="text-center mt-1" href={item.slug}>
+            <Link
+              className="text-center mt-1"
+              href={`/store/products/category/${item.slug}`}
+            >
               <span
                 className={`
                 text-xs font-medium text-gray-500

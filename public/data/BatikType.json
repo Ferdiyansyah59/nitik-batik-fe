@@ -1,0 +1,386 @@
+[
+  {
+    "id": 1,
+    "name": "Batik Yogyakarta",
+    "type": "Kraton",
+    "characteristic": "Filosofis dan Tradisional",
+    "icon": "🏺",
+    "origin": "Yogyakarta",
+    "meaning": "Melambangkan keagungan keraton dan nilai-nilai Jawa",
+    "description": "Motif eksklusif yang dulu hanya digunakan oleh keluarga kerajaan Jawa.",
+    "img": "/img/category/kraton.png",
+    "colorClasses": {
+      "bgColor": "from-amber-200 to-amber-100",
+      "borderColor": "border-amber-400",
+      "textColor": "text-amber-600"
+    }
+  },
+  {
+    "id": 2,
+    "name": "Batik Solo",
+    "type": "Parang",
+    "characteristic": "Halus dan Bermakna",
+    "icon": "🕌",
+    "origin": "Surakarta",
+    "meaning": "Simbol kekuatan dan keteguhan hati",
+    "description": "Motif garis menyerong yang berarti kekuatan dan ketekunan, salah satu motif tertua di Jawa.",
+    "img": "/img/category/parang.png",
+    "colorClasses": {
+      "bgColor": "from-blue-200 to-blue-100",
+      "borderColor": "border-blue-400",
+      "textColor": "text-blue-600"
+    }
+  },
+  {
+    "id": 3,
+    "name": "Batik Pekalongan",
+    "type": "pekalongan",
+    "characteristic": "Beragam Warna dan Motif",
+    "icon": "🌈",
+    "origin": "Pekalongan",
+    "meaning": "Perpaduan budaya pesisir dan perdagangan",
+    "description": "Dikenal dengan warna-warni cerah dan motif flora fauna, sangat dipengaruhi budaya Tionghoa dan Belanda.",
+    "img": "/img/category/pekalongan.png",
+    "colorClasses": {
+      "bgColor": "from-green-200 to-green-100",
+      "borderColor": "border-green-400",
+      "textColor": "text-green-600"
+    }
+  },
+  {
+    "id": 4,
+    "name": "Batik Madura",
+    "type": "Gentongan",
+    "characteristic": "Berani dan Kontras",
+    "icon": "🌊",
+    "origin": "Madura",
+    "meaning": "Menggambarkan karakter tegas masyarakat Madura",
+    "description": "Ciri khas Madura dengan warna-warna kontras dan dibuat dengan teknik celup gentong.",
+    "img": "/img/category/gentongan.jpg",
+    "colorClasses": {
+      "bgColor": "from-red-200 to-red-100",
+      "borderColor": "border-red-400",
+      "textColor": "text-red-600"
+    }
+  },
+  {
+    "id": 5,
+    "name": "Batik Kawung",
+    "type": "Kawung",
+    "characteristic": "Geometris dan Sakral",
+    "icon": "🌀",
+    "origin": "Jawa Tengah",
+    "meaning": "Melambangkan kesucian dan keadilan",
+    "description": "Motif klasik berbentuk buah kawung, melambangkan kesucian dan pengendalian diri.",
+    "img": "/img/category/kawung.jpg",
+    "colorClasses": {
+      "bgColor": "from-purple-200 to-purple-100",
+      "borderColor": "border-purple-400",
+      "textColor": "text-purple-600"
+    }
+  },
+  {
+    "id": 6,
+    "name": "Batik Megamendung",
+    "type": "Megamendung",
+    "characteristic": "Awan Bergelombang",
+    "icon": "☁️",
+    "origin": "Cirebon",
+    "meaning": "Simbol kesabaran dan ketenangan jiwa",
+    "description": "Motif awan dari Cirebon yang melambangkan ketenangan dan keteguhan hati.",
+    "img": "/img/category/megamendung.jpg",
+    "colorClasses": {
+      "bgColor": "from-cyan-200 to-cyan-100",
+      "borderColor": "border-cyan-400",
+      "textColor": "text-cyan-600"
+    }
+  },
+  {
+    "id": 7,
+    "name": "Batik Dayak",
+    "type": "Dayak",
+    "characteristic": "Motif Alam Borneo",
+    "icon": "🌿",
+    "origin": "Kalimantan",
+    "meaning": "Kearifan lokal suku Dayak dengan alam",
+    "description": "Batik dengan pola khas suku Dayak yang kaya akan makna spiritual dan simbolis.",
+    "img": "/img/category/dayak.jpg",
+    "colorClasses": {
+      "bgColor": "from-emerald-200 to-emerald-100",
+      "borderColor": "border-emerald-400",
+      "textColor": "text-emerald-600"
+    }
+  },
+  {
+    "id": 8,
+    "name": "Batik Geblek Renteng",
+    "type": "Geblek Renteng",
+    "characteristic": "Motif Makanan Tradisional",
+    "icon": "🥯",
+    "origin": "Kulon Progo",
+    "meaning": "Melambangkan kebersamaan dan gotong royong",
+    "description": "Motif dari Kulon Progo, terinspirasi dari makanan tradisional geblek yang berbentuk lingkaran.",
+    "img": "/img/category/geblek_renteng.jpg",
+    "colorClasses": {
+      "bgColor": "from-orange-200 to-orange-100",
+      "borderColor": "border-orange-400",
+      "textColor": "text-orange-600"
+    }
+  },
+  {
+    "id": 9,
+    "name": "Batik Corak Insang",
+    "type": "Corak Insang",
+    "characteristic": "Motif Kehidupan Laut",
+    "icon": "🐟",
+    "origin": "Pesisir",
+    "meaning": "Menggambarkan kehidupan nelayan pesisir",
+    "description": "Motif khas Kalimantan yang menyerupai insang ikan, mencerminkan kehidupan laut.",
+    "img": "/img/category/corak_insang.jpg",
+    "colorClasses": {
+      "bgColor": "from-teal-200 to-teal-100",
+      "borderColor": "border-teal-400",
+      "textColor": "text-teal-600"
+    }
+  },
+  {
+    "id": 10,
+    "name": "Batik Pring Sedapur",
+    "type": "Pring Sedapur",
+    "characteristic": "Motif Bambu Magetan",
+    "icon": "🎋",
+    "origin": "Magetan",
+    "meaning": "Kekuatan dan kelenturan seperti bambu",
+    "description": "Motif bambu yang menggambarkan kerukunan dan kesederhanaan dalam hidup.",
+    "img": "/img/category/pring_sedapur.jpg",
+    "colorClasses": {
+      "bgColor": "from-lime-200 to-lime-100",
+      "borderColor": "border-lime-400",
+      "textColor": "text-lime-600"
+    }
+  },
+  {
+    "id": 11,
+    "name": "Batik Simbut",
+    "type": "Simbut",
+    "characteristic": "Motif Geometris Banten",
+    "icon": "💎",
+    "origin": "Banten",
+    "meaning": "Kekayaan budaya Sunda Banten",
+    "description": "Batik khas Banten dengan motif daun simbut sebagai simbol kesuburan.",
+    "img": "/img/category/simbut.jpg",
+    "colorClasses": {
+      "bgColor": "from-rose-200 to-rose-100",
+      "borderColor": "border-rose-400",
+      "textColor": "text-rose-600"
+    }
+  },
+  {
+    "id": 12,
+    "name": "Batik Bali",
+    "type": "bali",
+    "characteristic": "Motif Hindu-Bali",
+    "icon": "🌺",
+    "origin": "Bali",
+    "meaning": "Harmoni spiritual dan alam Bali",
+    "description": "Motif yang terinspirasi dari alam dan kehidupan spiritual Bali dengan warna-warna cerah dan vibran.",
+    "img": "/img/category/bali.png",
+    "colorClasses": {
+      "bgColor": "from-pink-200 to-pink-100",
+      "borderColor": "border-pink-400",
+      "textColor": "text-pink-600"
+    }
+  },
+  {
+    "id": 13,
+    "name": "Batik Betawi",
+    "type": "betawi",
+    "characteristic": "Budaya Jakarta Tempo Dulu",
+    "icon": "🏛️",
+    "origin": "Jakarta",
+    "meaning": "Perpaduan budaya dalam masyarakat Betawi",
+    "description": "Motif ceria dengan warna kontras, sering menampilkan ondel-ondel dan ikon budaya Betawi lainnya.",
+    "img": "/img/category/betawi.png",
+    "colorClasses": {
+      "bgColor": "from-indigo-200 to-indigo-100",
+      "borderColor": "border-indigo-400",
+      "textColor": "text-indigo-600"
+    }
+  },
+  {
+    "id": 14,
+    "name": "Batik Celup",
+    "type": "celup",
+    "characteristic": "Teknik Pewarnaan Khusus",
+    "icon": "🎨",
+    "origin": "Berbagai Daerah",
+    "meaning": "Keindahan dari proses pewarnaan alami",
+    "description": "Teknik pewarnaan batik dengan metode celup, menghasilkan motif yang unik dan tak beraturan.",
+    "img": "/img/category/celup.jpg",
+    "colorClasses": {
+      "bgColor": "from-violet-200 to-violet-100",
+      "borderColor": "border-violet-400",
+      "textColor": "text-violet-600"
+    }
+  },
+  {
+    "id": 15,
+    "name": "Batik Cendrawasih",
+    "type": "cendrawasih",
+    "characteristic": "Burung Surga Papua",
+    "icon": "🦜",
+    "origin": "Papua",
+    "meaning": "Keindahan dan kemegahan alam Papua",
+    "description": "Motif burung cendrawasih dari Papua yang melambangkan keindahan dan kebebasan.",
+    "img": "/img/category/cendrawasih.jpg",
+    "colorClasses": {
+      "bgColor": "from-yellow-200 to-yellow-100",
+      "borderColor": "border-yellow-400",
+      "textColor": "text-yellow-600"
+    }
+  },
+  {
+    "id": 16,
+    "name": "Batik Ceplok",
+    "type": "ceplok",
+    "characteristic": "Motif Bulat Berulang",
+    "icon": "⭕",
+    "origin": "Jawa Tengah",
+    "meaning": "Kesatuan dan keharmonisan hidup",
+    "description": "Motif geometris berulang yang melambangkan keteraturan dan harmoni.",
+    "img": "/img/category/ceplok.jpg",
+    "colorClasses": {
+      "bgColor": "from-gray-200 to-gray-100",
+      "borderColor": "border-gray-400",
+      "textColor": "text-gray-600"
+    }
+  },
+  {
+    "id": 17,
+    "name": "Batik Ciamis",
+    "type": "ciamis",
+    "characteristic": "Khas Priangan Timur",
+    "icon": "🏔️",
+    "origin": "Ciamis",
+    "meaning": "Ketenangan alam pegunungan Priangan",
+    "description": "Motif khas dari daerah Ciamis dengan sentuhan alam dan budaya Sunda.",
+    "img": "/img/category/ciamis.jpg",
+    "colorClasses": {
+      "bgColor": "from-slate-200 to-slate-100",
+      "borderColor": "border-slate-400",
+      "textColor": "text-slate-600"
+    }
+  },
+  {
+    "id": 18,
+    "name": "Batik Garutan",
+    "type": "garutan",
+    "characteristic": "Motif Garut Tradisional",
+    "icon": "🦆",
+    "origin": "Garut",
+    "meaning": "Kekayaan alam dan budaya Garut",
+    "description": "Batik dari Garut dengan warna-warna cerah dan motif yang bersifat naturalis.",
+    "img": "/img/category/garutan.jpg",
+    "colorClasses": {
+      "bgColor": "from-stone-200 to-stone-100",
+      "borderColor": "border-stone-400",
+      "textColor": "text-stone-600"
+    }
+  },
+  {
+    "id": 19,
+    "name": "Batik Priangan",
+    "type": "priangan",
+    "characteristic": "Motif Sunda Klasik",
+    "icon": "🌸",
+    "origin": "Jawa Barat",
+    "meaning": "Keanggunan budaya Sunda Priangan",
+    "description": "Motif khas tatar Sunda dengan nuansa klasik dan warna lembut.",
+    "img": "/img/category/priangan.jpg",
+    "colorClasses": {
+      "bgColor": "from-fuchsia-200 to-fuchsia-100",
+      "borderColor": "border-fuchsia-400",
+      "textColor": "text-fuchsia-600"
+    }
+  },
+  {
+    "id": 20,
+    "name": "Batik Sekar",
+    "type": "sekar",
+    "characteristic": "Motif Bunga-bungaan",
+    "icon": "🌻",
+    "origin": "Jawa",
+    "meaning": "Keindahan dan keharuman bunga",
+    "description": "Motif bunga yang menggambarkan keindahan, kesegaran, dan kelembutan jiwa.",
+    "img": "/img/category/sekar.jpg",
+    "colorClasses": {
+      "bgColor": "from-amber-300 to-amber-200",
+      "borderColor": "border-amber-500",
+      "textColor": "text-amber-700"
+    }
+  },
+  {
+    "id": 21,
+    "name": "Batik Sidoluhur",
+    "type": "sidoluhur",
+    "characteristic": "Motif Klasik Jawa",
+    "icon": "👑",
+    "origin": "Jawa Tengah",
+    "meaning": "Keluhuran budi dan martabat",
+    "description": "Motif keraton yang biasa dipakai pengantin, melambangkan keluhuran dan kehormatan.",
+    "img": "/img/category/sidoluhur.jpg",
+    "colorClasses": {
+      "bgColor": "from-blue-300 to-blue-200",
+      "borderColor": "border-blue-500",
+      "textColor": "text-blue-700"
+    }
+  },
+  {
+    "id": 22,
+    "name": "Batik Sidomukti",
+    "type": "sidomukti",
+    "characteristic": "Motif Kemakmuran",
+    "icon": "🌾",
+    "origin": "Jawa Tengah",
+    "meaning": "Harapan kemakmuran dan kesejahteraan",
+    "description": "Melambangkan harapan kehidupan yang makmur, biasa dipakai dalam pernikahan adat Jawa.",
+    "img": "/img/category/sidomukti.jpg",
+    "colorClasses": {
+      "bgColor": "from-green-300 to-green-200",
+      "borderColor": "border-green-500",
+      "textColor": "text-green-700"
+    }
+  },
+  {
+    "id": 23,
+    "name": "Batik Sogan",
+    "type": "sogan",
+    "characteristic": "Warna Cokelat Klasik",
+    "icon": "🤎",
+    "origin": "Yogyakarta & Solo",
+    "meaning": "Kesederhanaan dan kebijaksanaan",
+    "description": "Motif tradisional dengan dominasi warna cokelat kehitaman yang anggun dan klasik.",
+    "img": "/img/category/sogan.jpg",
+    "colorClasses": {
+      "bgColor": "from-amber-400 to-amber-300",
+      "borderColor": "border-amber-600",
+      "textColor": "text-amber-800"
+    }
+  },
+  {
+    "id": 24,
+    "name": "Batik Tambal",
+    "type": "tambal",
+    "characteristic": "Motif Perca Berwarna",
+    "icon": "🧩",
+    "origin": "Yogyakarta",
+    "meaning": "Kreatifitas dalam keterbatasan",
+    "description": "Motif tambal-tambalan yang dipercaya membawa penyembuhan dan perlindungan.",
+    "img": "/img/category/tambal.jpg",
+    "colorClasses": {
+      "bgColor": "from-red-300 to-red-200",
+      "borderColor": "border-red-500",
+      "textColor": "text-red-700"
+    }
+  }
+]

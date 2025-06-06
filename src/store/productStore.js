@@ -352,7 +352,9 @@ const useProductStore = create((set, get) => ({
         params.search = search.trim();
       }
 
-      const response = await axiosInstance.get(`/products`, {
+      console.log('📡 Fetching all public products with params:', params);
+
+      const response = await axiosInstance.get('/products', {
         params,
         timeout: 15000, // 15 second timeout for this request
       });
@@ -385,6 +387,21 @@ const useProductStore = create((set, get) => ({
       }
     } catch (error) {
       console.error('❌ Error fetching products:', error);
+
+      // ✅ PERBAIKAN: Definisikan errorMessage yang hilang
+      let errorMessage = 'Failed to fetch products';
+
+      if (error.code === 'ERR_NETWORK') {
+        errorMessage = `Network Error: Cannot connect to API server (${API_URL})`;
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Request timeout: API server took too long to respond';
+      } else if (error.response) {
+        errorMessage =
+          error.response.data?.message ||
+          `HTTP ${error.response.status}: ${error.response.statusText}`;
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
 
       set({
         error: errorMessage,
@@ -435,6 +452,84 @@ const useProductStore = create((set, get) => ({
         totalPages: 0,
       },
     });
+  },
+
+  // Public: fetch all product by category
+  fetchAllPublicProductBySlug: async (
+    slug,
+    page = 1,
+    limit = 12,
+    search = '',
+  ) => {
+    set({ loading: true, error: null });
+
+    try {
+      const params = {
+        page: page.toString(),
+        limit: limit.toString(),
+      };
+
+      if (search && search.trim()) {
+        params.search = search.trim();
+      }
+
+      console.log('📡 Fetching all public products with params:', params);
+
+      const response = await axiosInstance.get(`/products/category/${slug}`, {
+        params,
+        timeout: 15000, // 15 second timeout for this request
+      });
+
+      console.log('✅ Products API response:', response.data);
+
+      if (response.data && response.data.status) {
+        // ✅ PERBAIKAN: Pastikan products selalu array
+        const products = Array.isArray(response.data.data?.products)
+          ? response.data.data.products
+          : [];
+
+        const pagination = response.data.data?.pagination || {
+          page: 1,
+          limit: 12,
+          totalItems: 0,
+          totalPages: 0,
+        };
+
+        console.log('✅ Setting products:', products.length, 'items');
+
+        set({
+          products,
+          pagination,
+          loading: false,
+          error: null,
+        });
+      } else {
+        throw new Error(response.data?.message || 'Invalid response format');
+      }
+    } catch (error) {
+      console.error('❌ Error fetching products:', error);
+
+      // ✅ PERBAIKAN: Definisikan errorMessage yang hilang
+      let errorMessage = 'Failed to fetch products';
+
+      if (error.code === 'ERR_NETWORK') {
+        errorMessage = `Network Error: Cannot connect to API server (${API_URL})`;
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Request timeout: API server took too long to respond';
+      } else if (error.response) {
+        errorMessage =
+          error.response.data?.message ||
+          `HTTP ${error.response.status}: ${error.response.statusText}`;
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+
+      set({
+        error: errorMessage,
+        loading: false,
+        products: [], // ✅ PERBAIKAN: Set ke empty array saat error
+      });
+    }
   },
 
   // Change pagination
