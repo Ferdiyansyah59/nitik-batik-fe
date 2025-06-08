@@ -1,4 +1,7 @@
-function Hero() {
+'use client';
+import Link from 'next/link';
+
+function Hero({ onScrollToProducts }) {
   return (
     <div className="relative overflow-hidden">
       {/* Hero Content */}
@@ -55,12 +58,18 @@ function Hero() {
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4 mb-12">
-            <button className="bg-amber-800 text-white font-medium py-3 px-8 rounded-full shadow-lg hover:bg-amber-900 transition-all duration-300 transform hover:-translate-y-1">
+            <button
+              onClick={onScrollToProducts}
+              className="bg-amber-800 text-white font-medium py-3 px-8 rounded-full shadow-lg hover:bg-amber-900 transition-all duration-300 transform hover:-translate-y-1"
+            >
               Koleksi Terbaru
             </button>
-            <button className="bg-transparent border-2 border-gray-800 text-gray-800 font-medium py-3 px-8 rounded-full hover:bg-gray-800 hover:text-white transition-all duration-300">
+            <Link
+              href="/store/products"
+              className="bg-transparent border-2 border-gray-800 text-gray-800 font-medium py-3 px-8 rounded-full hover:bg-gray-800 hover:text-white transition-all duration-300"
+            >
               Lihat Katalog
-            </button>
+            </Link>
           </div>
 
           {/* Features */}

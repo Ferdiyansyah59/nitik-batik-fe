@@ -1,4 +1,4 @@
-// src/hooks/useProducts.js
+// src/hooks/useProducts.js - MERGED VERSION with existing functionality
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import useProductStore from '@/store/productStore';
 import { useAuthStore } from '@/store/auth-store';
@@ -29,6 +29,8 @@ export function useProducts(options = {}) {
     clearError,
     clearProducts,
     fetchLatestProduct,
+    resetFetchState,
+    clearCache,
   } = useProductStore();
 
   // Local state
@@ -74,7 +76,7 @@ export function useProducts(options = {}) {
       }
     },
     [storeId, limit, fetchProductsByStore],
-  ); // HANYA dependency yang stabil
+  );
 
   // ✅ Fetch products ketika store ID tersedia - HANYA SEKALI
   useEffect(() => {
@@ -83,7 +85,7 @@ export function useProducts(options = {}) {
       fetchProducts(page, search);
       setHasFetchedStore(true);
     }
-  }, [autoFetch, storeId, canManageProducts, hasFetchedStore]); // Tidak include fetchProducts
+  }, [autoFetch, storeId, canManageProducts, hasFetchedStore]);
 
   // ✅ Reset fetch flag when store changes
   useEffect(() => {
@@ -167,13 +169,37 @@ export function useProducts(options = {}) {
     };
   }, [safeProducts]);
 
-  const getLatestProduct = useCallback(async () => {
-    try {
-      await fetchLatestProduct();
-    } catch (error) {
-      console.log('useProducts: Error fetching latest product', error);
-    }
-  }, [fetchLatestProduct]);
+  // ✅ getLatestProduct - simplified version
+  const getLatestProduct = useCallback(
+    async (forceRefresh = true) => {
+      try {
+        console.log('🔍 useProducts: Fetching latest products...', {
+          forceRefresh,
+        });
+
+        // ✅ ALWAYS force refresh untuk navigasi yang konsisten
+        const result = await fetchLatestProduct(0, forceRefresh);
+        console.log(
+          '✅ useProducts: Latest products fetched:',
+          result?.length || 0,
+        );
+
+        return result;
+      } catch (error) {
+        console.error('❌ useProducts: Error fetching latest product', error);
+        return [];
+      }
+    },
+    [fetchLatestProduct],
+  );
+
+  // ✅ Cleanup effect untuk reset state saat unmount
+  useEffect(() => {
+    return () => {
+      console.log('🔄 useProducts cleanup: resetting fetch state');
+      resetFetchState();
+    };
+  }, [resetFetchState]);
 
   // ✅ Format price helper
   const formatPrice = useCallback((price) => {
@@ -225,6 +251,8 @@ export function useProducts(options = {}) {
     clearError,
     getProductStats,
     formatPrice,
+    resetFetchState,
+    clearCache,
   };
 }
 

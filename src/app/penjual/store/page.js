@@ -156,16 +156,6 @@ function Store() {
           <p className="text-gray-600">
             Lengkapi informasi di bawah untuk membuat toko batik Anda
           </p>
-
-          {/* ✅ Debug info untuk development */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-left">
-              <strong>Debug Info:</strong>
-              <pre className="mt-1 overflow-auto max-h-32">
-                {JSON.stringify(debugInfo, null, 2)}
-              </pre>
-            </div>
-          )}
         </div>
 
         {/* ✅ Error Alert */}

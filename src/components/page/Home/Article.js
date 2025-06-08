@@ -26,7 +26,7 @@ function Article() {
       </div>
 
       {/* ✅ 5 kolom dalam 1 baris */}
-      <div className="grid grid-cols-5 gap-6">
+      <div className="grid grid-rows-5 grid-cols-1 lg:grid-rows-1 lg:grid-cols-5 gap-6">
         {articles.map((item, idx) => (
           <div
             key={idx}

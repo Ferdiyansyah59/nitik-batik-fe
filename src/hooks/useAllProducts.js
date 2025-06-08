@@ -1,15 +1,16 @@
-// src/hooks/useAllProducts.js
+// src/hooks/useAllProducts.js - FIXED for search functionality
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import useProductStore from '@/store/productStore';
 
 export function useAllProducts(options = {}) {
   const {
     page = 1,
-    limit = 40,
+    limit = 12,
     search = '',
     sortBy = 'newest',
     autoFetch = true,
-  } = options;
+    categorySlug = null,
+  } = options || {};
 
   // Product store
   const {
@@ -18,143 +19,128 @@ export function useAllProducts(options = {}) {
     loading: productLoading,
     error,
     fetchAllPublicProduct,
+    fetchAllPublicProductBySlug,
     clearError,
     clearProducts,
   } = useProductStore();
 
-  // Local state untuk sorting
-  const [currentSort, setCurrentSort] = useState(sortBy);
+  // Local state for UI features
   const [hasFetched, setHasFetched] = useState(false);
+  const [currentSort, setCurrentSort] = useState(sortBy);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // ✅ Pastikan products selalu array
-  const rawProducts = useMemo(() => {
+  const safeProducts = useMemo(() => {
     return Array.isArray(products) ? products : [];
   }, [products]);
 
-  // ✅ Implementasi sorting di frontend
-  const sortedProducts = useMemo(() => {
-    if (rawProducts.length === 0) return [];
-
-    const sorted = [...rawProducts].sort((a, b) => {
-      switch (currentSort) {
-        case 'newest':
-          // Sort berdasarkan created_at atau id (descending)
-          return (
-            new Date(b.created_At || b.createdAt || '2024-01-01') -
-            new Date(a.created_At || a.createdAt || '2024-01-01')
-          );
-
-        case 'oldest':
-          // Sort berdasarkan created_at atau id (ascending)
-          return (
-            new Date(a.created_At || a.createdAt || '2024-01-01') -
-            new Date(b.created_At || b.createdAt || '2024-01-01')
-          );
-
-        case 'name':
-          // Sort berdasarkan nama A-Z
-          return a.name.localeCompare(b.name, 'id', { sensitivity: 'base' });
-
-        case 'price_low':
-          // Sort harga terendah ke tertinggi
-          return (a.harga || 0) - (b.harga || 0);
-
-        case 'price_high':
-          // Sort harga tertinggi ke terendah
-          return (b.harga || 0) - (a.harga || 0);
-
-        case 'store_name':
-          // Sort berdasarkan nama toko A-Z
-          return (a.store_name || '').localeCompare(b.store_name || '', 'id', {
-            sensitivity: 'base',
-          });
-
-        case 'category':
-          // Sort berdasarkan kategori A-Z
-          return (a.category_name || '').localeCompare(
-            b.category_name || '',
-            'id',
-            { sensitivity: 'base' },
-          );
-
-        default:
-          return 0;
-      }
-    });
-
-    console.log(`🔄 Sorted ${sorted.length} products by ${currentSort}`);
-    return sorted;
-  }, [rawProducts, currentSort]);
-
-  // ✅ Loading state
-  const loading = productLoading;
-
-  // ✅ Fetch products dari API
+  // ✅ FIXED: Fetch function yang simple dan reliable
   const fetchProducts = useCallback(
-    async (pageNum = page, searchTerm = search) => {
+    async (pageNum = 1, searchTerm = '') => {
       try {
-        console.log(
-          '🔍 Fetching products from API - page:',
+        console.log('🔍 fetchProducts called with:', {
           pageNum,
-          'search:',
           searchTerm,
-          'limit:',
-          limit,
-        );
+          categorySlug,
+        });
 
-        // Panggil API tanpa storeId (null) untuk semua produk
-        await fetchAllPublicProduct(null, pageNum, limit, searchTerm);
+        setIsSearching(true);
+
+        if (categorySlug) {
+          await fetchAllPublicProductBySlug(
+            categorySlug,
+            pageNum,
+            limit,
+            searchTerm,
+          );
+        } else {
+          await fetchAllPublicProduct(pageNum, limit, searchTerm);
+        }
+
         setHasFetched(true);
-
+        setSearchQuery(searchTerm);
         console.log('✅ Products fetched successfully');
       } catch (error) {
-        console.error('❌ useAllProducts: Error fetching products:', error);
+        console.error('❌ Error fetching products:', error);
+      } finally {
+        setIsSearching(false);
       }
     },
-    [limit, fetchAllPublicProduct],
+    [limit, categorySlug, fetchAllPublicProduct, fetchAllPublicProductBySlug],
   );
 
-  // ✅ Initial fetch
+  // ✅ Auto-fetch saat component mount
   useEffect(() => {
     if (autoFetch && !hasFetched) {
-      console.log('🚀 Auto-fetching products on component mount');
+      console.log('🚀 Auto-fetching products on mount');
       fetchProducts(page, search);
     }
-  }, [autoFetch, hasFetched, fetchProducts, page, search]);
+  }, [autoFetch, hasFetched, page, search, fetchProducts]);
 
-  // ✅ Refresh function
+  // ✅ Manual refresh
   const refresh = useCallback(() => {
-    console.log('🔄 Manual refresh products');
-    clearProducts();
+    console.log('🔄 Manual refresh triggered');
     setHasFetched(false);
-    fetchProducts(1, search);
-  }, [fetchProducts, search, clearProducts]);
+    setIsSearching(false);
+    fetchProducts(page, searchQuery);
+  }, [fetchProducts, page, searchQuery]);
 
-  // ✅ Search function
+  // ✅ Search function - mirip Article Card
   const searchProducts = useCallback(
-    (searchTerm) => {
-      console.log('🔍 Searching products:', searchTerm);
+    (searchTerm = '') => {
+      console.log('🔍 Search products:', searchTerm);
+      setIsSearching(true);
       setHasFetched(false);
       fetchProducts(1, searchTerm);
     },
     [fetchProducts],
   );
 
-  // ✅ Sort function (frontend only)
-  const sortProducts = useCallback((sort) => {
-    console.log('🔄 Sorting products:', sort);
-    setCurrentSort(sort);
+  // ✅ Sort function - Frontend sorting
+  const sortProducts = useCallback((sortType) => {
+    console.log('🔄 Sorting products by:', sortType);
+    setCurrentSort(sortType);
   }, []);
+
+  // ✅ Sorted products berdasarkan currentSort
+  const sortedProducts = useMemo(() => {
+    if (!currentSort || safeProducts.length === 0) {
+      return safeProducts;
+    }
+
+    const sorted = [...safeProducts].sort((a, b) => {
+      switch (currentSort) {
+        case 'newest':
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        case 'oldest':
+          return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+        case 'name':
+          return (a.name || '').localeCompare(b.name || '');
+        case 'price_low':
+          return (a.harga || 0) - (b.harga || 0);
+        case 'price_high':
+          return (b.harga || 0) - (a.harga || 0);
+        case 'store_name':
+          return (a.store_name || '').localeCompare(b.store_name || '');
+        case 'category':
+          return (a.category_name || '').localeCompare(b.category_name || '');
+        default:
+          return 0;
+      }
+    });
+
+    return sorted;
+  }, [safeProducts, currentSort]);
 
   // ✅ Pagination helpers
   const handlePageChange = useCallback(
     (newPage) => {
-      if (newPage === pagination.page) return;
-
-      console.log('📄 Changing to page:', newPage);
-      fetchProducts(newPage, search);
+      console.log('📄 Page change to:', newPage);
+      setHasFetched(false);
+      fetchProducts(newPage, searchQuery);
     },
-    [fetchProducts, search, pagination.page],
+    [fetchProducts, searchQuery],
   );
 
   const nextPage = useCallback(() => {
@@ -171,80 +157,38 @@ export function useAllProducts(options = {}) {
 
   // ✅ Format price helper
   const formatPrice = useCallback((price) => {
+    const safePrice = price !== null && price !== undefined ? price : 0;
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
       minimumFractionDigits: 0,
-    }).format(price || 0);
+    }).format(safePrice);
   }, []);
-
-  // ✅ Get unique categories from current products
-  const getAvailableCategories = useCallback(() => {
-    const categories = new Map();
-
-    sortedProducts.forEach((product) => {
-      if (product.category_slug && product.category_name) {
-        categories.set(product.category_slug, {
-          slug: product.category_slug,
-          name: product.category_name,
-          count: (categories.get(product.category_slug)?.count || 0) + 1,
-        });
-      }
-    });
-
-    return Array.from(categories.values()).sort((a, b) => b.count - a.count);
-  }, [sortedProducts]);
-
-  // ✅ Get products stats
-  const getProductStats = useCallback(() => {
-    const totalProducts = sortedProducts.length;
-    const avgPrice =
-      sortedProducts.length > 0
-        ? sortedProducts.reduce(
-            (sum, product) => sum + (product.harga || 0),
-            0,
-          ) / sortedProducts.length
-        : 0;
-
-    const priceRanges = {
-      under100k: sortedProducts.filter((p) => (p.harga || 0) < 100000).length,
-      '100k-500k': sortedProducts.filter(
-        (p) => (p.harga || 0) >= 100000 && (p.harga || 0) < 500000,
-      ).length,
-      '500k-1m': sortedProducts.filter(
-        (p) => (p.harga || 0) >= 500000 && (p.harga || 0) < 1000000,
-      ).length,
-      over1m: sortedProducts.filter((p) => (p.harga || 0) >= 1000000).length,
-    };
-
-    return {
-      totalProducts,
-      avgPrice,
-      priceRanges,
-      categories: getAvailableCategories(),
-    };
-  }, [sortedProducts, getAvailableCategories]);
 
   // ✅ Computed values
   const hasProducts = sortedProducts.length > 0;
-  const isEmpty = !loading && sortedProducts.length === 0 && !error;
+  const isEmpty =
+    !productLoading && !isSearching && sortedProducts.length === 0 && !error;
   const hasError = !!error;
   const hasNextPage = pagination.page < pagination.totalPages;
   const hasPrevPage = pagination.page > 1;
+  const isLoading = productLoading || isSearching;
 
   return {
-    // ✅ Data
-    products: sortedProducts, // Return sorted products
+    // ✅ Data - menggunakan sortedProducts
+    products: sortedProducts,
     pagination,
-    stats: getProductStats(),
 
     // ✅ States
-    loading,
+    loading: isLoading,
     error,
     hasProducts,
     isEmpty,
     hasError,
+    hasFetched,
     currentSort,
+    searchQuery,
+    isSearching,
 
     // ✅ Pagination states
     hasNextPage,
@@ -263,8 +207,9 @@ export function useAllProducts(options = {}) {
     prevPage,
     clearError,
     formatPrice,
-
-    // ✅ Utilities
-    getAvailableCategories,
   };
 }
+
+// ✅ Export sebagai named dan default export
+export { useAllProducts };
+export default useAllProducts;

@@ -1,10 +1,10 @@
-// src/components/page/Store/ProductsPage.js - FINAL with working search
+// src/components/page/Store/ProductsPageByStore.js - FIXED VERSION
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import SectionSubtitle from '@/components/micro/SectionSubtitle';
 import Description from '@/components/micro/Description';
-import { useAllProducts } from '@/hooks/useAllProducts';
+import { useStoreProducts } from '@/hooks/useStoreProducts';
 
 // Format harga ke format Rupiah
 function formatRupiah(angka) {
@@ -15,34 +15,36 @@ function formatRupiah(angka) {
   }).format(angka);
 }
 
-function ProductsPage() {
+function ProductsPageByStore() {
   // ✅ State untuk input dan search
   const [searchTerm, setSearchTerm] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [sortBy, setSortBy] = useState('newest');
 
-  // ✅ Menggunakan hook yang sudah diperbaiki
   const {
     products,
+    storeData,
+    rawStoreData, // ✅ Untuk debugging
+    isStoreDataLoaded, // ✅ Helper untuk check loading
     pagination,
+    storeId,
+
+    // States
     loading,
     error,
     hasProducts,
     isEmpty,
-    currentSort,
+    hasError,
     searchQuery,
+    isParamsReady,
+
+    // Actions
+    fetchProducts,
+    refresh,
     searchProducts,
-    sortProducts,
     handlePageChange,
     clearError,
-    refresh,
-  } = useAllProducts({
-    page: 1,
-    limit: 40, // 40 produk per halaman
-    search: '',
-    sortBy: sortBy,
-    autoFetch: true,
-  });
+  } = useStoreProducts();
 
   // ✅ Data warna untuk kategori
   const dataWarna = {
@@ -54,7 +56,30 @@ function ProductsPage() {
     'kain-batik': { bgColor: 'from-amber-300 to-amber-200' },
   };
 
-  // ✅ Handle search - mirip Article Card
+  // ✅ Debug effect
+  useEffect(() => {
+    console.log('🔍 ProductsPageByStore Debug:', {
+      storeId,
+      isParamsReady,
+      isStoreDataLoaded,
+      storeDataName: storeData.name,
+      rawStoreData,
+      productsLength: products?.length,
+      loading,
+      isEmpty,
+    });
+  }, [
+    storeId,
+    isParamsReady,
+    isStoreDataLoaded,
+    storeData.name,
+    rawStoreData,
+    products?.length,
+    loading,
+    isEmpty,
+  ]);
+
+  // ✅ Handle search
   const handleSearch = (e) => {
     e.preventDefault();
     console.log('Search triggered with:', inputValue);
@@ -68,7 +93,7 @@ function ProductsPage() {
     console.log('Clearing search');
     setInputValue('');
     setSearchTerm('');
-    searchProducts(''); // Search dengan empty string untuk semua produk
+    searchProducts('');
   };
 
   // ✅ Handle key press untuk Enter
@@ -83,12 +108,6 @@ function ProductsPage() {
     console.log('Page change to:', page);
     handlePageChange(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // ✅ Handle sort change
-  const handleSortChange = (newSortBy) => {
-    setSortBy(newSortBy);
-    sortProducts(newSortBy);
   };
 
   // ✅ Generate pagination numbers
@@ -119,8 +138,27 @@ function ProductsPage() {
     return pages;
   };
 
-  // ✅ Computed values
-  const showSearchInfo = searchQuery && searchQuery.length > 0;
+  // ✅ Helper untuk get safe image URL
+  const getStoreImageUrl = (imagePath) => {
+    if (!imagePath) return '/img/placeholder-store.jpg';
+
+    if (imagePath.startsWith('http')) return imagePath;
+
+    return `${process.env.NEXT_PUBLIC_API_URL}${imagePath}`;
+  };
+
+  // ✅ Loading state untuk params - PRIORITAS TERTINGGI
+  if (!isParamsReady || !storeId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading store information...</p>
+          <p className="mt-2 text-sm text-gray-500">Preparing store data</p>
+        </div>
+      </div>
+    );
+  }
 
   // ✅ Error state
   if (error) {
@@ -168,12 +206,135 @@ function ProductsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
+      {/* Header Section - Improved Design */}
       <section className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="text-center">
-            <SectionSubtitle title="Semua Produk Batik" />
-            <Description text="Jelajahi koleksi lengkap batik dari seluruh pengrajin Indonesia" />
-          </div>
+        <div className="max-w-7xl mx-auto">
+          {/* Banner Section */}
+          {isStoreDataLoaded && storeData.banner ? (
+            <div className="relative h-64 md:h-80 lg:h-96 overflow-hidden">
+              {/* Banner Image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(${getStoreImageUrl(storeData.banner)})`,
+                }}
+              >
+                {/* Dark Overlay untuk readability */}
+                <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+              </div>
+
+              {/* Store Info Overlay */}
+              <div className="relative z-10 flex items-end h-full">
+                <div className="w-full px-4 pb-8">
+                  <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
+                    {/* Store Avatar */}
+                    <div className="flex-shrink-0">
+                      <img
+                        src={getStoreImageUrl(storeData.avatar)}
+                        alt={storeData.name}
+                        className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                        onError={(e) => {
+                          e.target.src = '/img/placeholder-store.jpg';
+                        }}
+                      />
+                    </div>
+
+                    {/* Store Details */}
+                    <div className="text-center md:text-left text-white">
+                      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 drop-shadow-lg">
+                        {storeData.name}
+                      </h1>
+
+                      {storeData.description && (
+                        <p className="text-lg md:text-xl mb-4 opacity-90 drop-shadow-md max-w-2xl">
+                          {storeData.description}
+                        </p>
+                      )}
+
+                      {/* Store Contact Info */}
+                      <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm opacity-90">
+                        {storeData.whatsapp && (
+                          <div className="flex items-center bg-white bg-opacity-30 font-medium rounded-full px-3 py-1">
+                            <span className="mr-2">📱</span>
+                            <span>{storeData.whatsapp}</span>
+                          </div>
+                        )}
+                        {storeData.alamat && (
+                          <div className="flex items-center bg-white bg-opacity-30 font-medium rounded-full px-3 py-1">
+                            <span className="mr-2">📍</span>
+                            <span className="truncate max-w-xs">
+                              {storeData.alamat}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* No Banner - Clean Layout */
+            <div className="px-4 py-16">
+              {isStoreDataLoaded ? (
+                <div className="text-center">
+                  {/* Store Avatar */}
+                  {storeData.avatar && (
+                    <div className="mb-6">
+                      <img
+                        src={getStoreImageUrl(storeData.avatar)}
+                        alt={storeData.name}
+                        className="w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto object-cover border-4 border-primary shadow-lg"
+                        onError={(e) => {
+                          e.target.src = '/img/placeholder-store.jpg';
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Store Info */}
+                  <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    {storeData.name}
+                  </h1>
+
+                  {storeData.description && (
+                    <p className="text-lg text-gray-600 mb-6 max-w-3xl mx-auto">
+                      {storeData.description}
+                    </p>
+                  )}
+
+                  {/* Store Details */}
+                  <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+                    {storeData.whatsapp && (
+                      <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
+                        <span className="mr-2">📱</span>
+                        <span>{storeData.whatsapp}</span>
+                      </div>
+                    )}
+                    {storeData.alamat && (
+                      <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
+                        <span className="mr-2">📍</span>
+                        <span>{storeData.alamat}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Loading Placeholder */
+                <div className="text-center">
+                  <div className="animate-pulse">
+                    <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-300 rounded-full mx-auto mb-6"></div>
+                    <div className="h-8 md:h-10 bg-gray-300 rounded w-64 md:w-80 mx-auto mb-4"></div>
+                    <div className="h-4 md:h-5 bg-gray-300 rounded w-96 max-w-full mx-auto mb-6"></div>
+                    <div className="flex justify-center gap-4">
+                      <div className="h-8 bg-gray-300 rounded-full w-32"></div>
+                      <div className="h-8 bg-gray-300 rounded-full w-48"></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -181,7 +342,7 @@ function ProductsPage() {
       <section className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-            {/* Search Bar - Mirip Article Card */}
+            {/* Search Bar */}
             <form onSubmit={handleSearch} className="flex-1 max-w-md">
               <div className="relative">
                 <input
@@ -234,86 +395,14 @@ function ProductsPage() {
               </div>
             </form>
 
-            {/* Sort & Info */}
-            <div className="flex items-center gap-4">
-              <label className="text-sm font-medium text-gray-700">
-                Urutkan:
-              </label>
-              <select
-                value={currentSort || sortBy}
-                onChange={(e) => handleSortChange(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                disabled={loading}
-              >
-                <option value="newest">Terbaru</option>
-                <option value="oldest">Terlama</option>
-                <option value="name">Nama A-Z</option>
-                <option value="price_low">Harga Terendah</option>
-                <option value="price_high">Harga Tertinggi</option>
-                <option value="store_name">Nama Toko A-Z</option>
-                <option value="category">Kategori A-Z</option>
-              </select>
-
-              {/* Results Count */}
-              <div className="text-sm text-gray-600">
-                {loading ? (
-                  <div className="flex items-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-primary"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Memuat...
-                  </div>
-                ) : (
-                  <>
-                    {pagination.totalItems || 0} produk
-                    {searchQuery && ` untuk "${searchQuery}"`}
-                  </>
-                )}
-              </div>
-
-              {/* Refresh Button */}
-              <button
-                onClick={refresh}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                title="Refresh data"
-                disabled={loading}
-              >
-                <svg
-                  className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-              </button>
+            {/* Results Info */}
+            <div className="text-sm text-gray-600">
+              {isStoreDataLoaded && <span>Produk dari {storeData.name}</span>}
             </div>
           </div>
 
-          {/* Search Info - mirip Article Card */}
-          {showSearchInfo && (
+          {/* Search Info */}
+          {searchQuery && (
             <div className="mt-2 text-sm flex items-center justify-between">
               <span>
                 Menampilkan hasil untuk{' '}
@@ -339,10 +428,10 @@ function ProductsPage() {
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
                 <p className="mt-4 text-gray-600">
-                  Memuat produk dari server...
+                  Memuat produk dari store...
                 </p>
                 <p className="mt-2 text-sm text-gray-500">
-                  Mohon tunggu sebentar
+                  Store ID: {storeId}
                 </p>
               </div>
             </div>
@@ -370,7 +459,7 @@ function ProductsPage() {
               <p className="text-gray-600 mb-4">
                 {searchQuery
                   ? `Tidak ditemukan produk untuk pencarian "${searchQuery}"`
-                  : 'Belum ada produk yang tersedia saat ini'}
+                  : 'Store ini belum memiliki produk'}
               </p>
               {searchQuery && (
                 <button
@@ -383,7 +472,7 @@ function ProductsPage() {
             </div>
           ) : (
             <>
-              {/* Products Grid - 4 kolom */}
+              {/* Products Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
                 {products.map((item, idx) => (
                   <div
@@ -421,7 +510,7 @@ function ProductsPage() {
                       {/* Shop Name & Category */}
                       <div className="flex justify-between items-center mb-1">
                         <p className="text-xs text-gray-500 font-medium truncate">
-                          {item.store_name || 'Toko Batik'}
+                          {storeData.name || 'Toko Batik'}
                         </p>
                         {item.category_slug &&
                           dataWarna[item.category_slug] && (
@@ -501,28 +590,6 @@ function ProductsPage() {
               <div className="text-center text-sm text-gray-600 pb-8">
                 Halaman {pagination.page} dari {pagination.totalPages} (Total:{' '}
                 {pagination.totalItems} produk)
-                <br />
-                Menampilkan {(pagination.page - 1) * 40 + 1}-
-                {Math.min(pagination.page * 40, pagination.totalItems)} dari{' '}
-                {pagination.totalItems} produk
-                {currentSort && currentSort !== 'newest' && (
-                  <span className="block mt-1 text-xs text-gray-500">
-                    Diurutkan berdasarkan:{' '}
-                    {currentSort === 'oldest'
-                      ? 'Terlama'
-                      : currentSort === 'name'
-                        ? 'Nama A-Z'
-                        : currentSort === 'price_low'
-                          ? 'Harga Terendah'
-                          : currentSort === 'price_high'
-                            ? 'Harga Tertinggi'
-                            : currentSort === 'store_name'
-                              ? 'Nama Toko A-Z'
-                              : currentSort === 'category'
-                                ? 'Kategori A-Z'
-                                : currentSort}
-                  </span>
-                )}
               </div>
             </>
           )}
@@ -532,4 +599,4 @@ function ProductsPage() {
   );
 }
 
-export default ProductsPage;
+export default ProductsPageByStore;

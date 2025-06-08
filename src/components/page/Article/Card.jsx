@@ -104,7 +104,8 @@ function CardArticle() {
                     </p>
 
                     <p className="text-sm text-gray-500 mb-4 line-clamp-3">
-                      {article.excerpt || 'No excerpt available'}
+                      {article.excerpt?.replace(/<[^>]*>/g, '') ||
+                        'No excerpt available'}
                     </p>
 
                     <div className="mt-2">

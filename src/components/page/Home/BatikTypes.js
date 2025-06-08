@@ -7,19 +7,19 @@ export default function BatikTypes() {
       name: 'Batik Tulis',
       description: 'Dikerjakan secara manual dengan menggunakan canting.',
       difficulty: 'Tinggi',
-      image: '/img/batik-tulis.jpg',
+      image: '/img/tulis.jpg',
     },
     {
       name: 'Batik Cap',
       description: 'Dibuat menggunakan cap atau stempel khusus.',
       difficulty: 'Sedang',
-      image: '/img/batik-cap.jpg',
+      image: '/img/cap.jpg',
     },
     {
       name: 'Batik Print',
       description: 'Dicetak menggunakan mesin dengan teknologi modern.',
       difficulty: 'Rendah',
-      image: '/img/batik-print.jpg',
+      image: '/img/print.png',
     },
   ];
 

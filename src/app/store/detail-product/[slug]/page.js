@@ -60,6 +60,17 @@ function DetailProduct() {
     }).format(price);
   };
 
+  const handleWhatsapp = () => {
+    let phoneNumber = product.store.whatsapp;
+    const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+    const message = encodeURIComponent(
+      `Halo ${product.store.name} saya ingin memesan produk batik ${product.name}`,
+    );
+
+    const whatsappLink = `https://api.whatsapp.com/send?phone=${cleanPhoneNumber}&text=${message}`;
+    window.open(whatsappLink, '_blank');
+  };
+
   const handleStoreDetail = () => {
     router.push(`/store/${product.store.id}`);
   };
@@ -185,7 +196,7 @@ function DetailProduct() {
 
           {/* Quantity and Add to Bag */}
           <div className="flex gap-2 mb-6">
-            <div className="flex border border-gray-300 rounded-sm">
+            {/* <div className="flex border border-gray-300 rounded-sm">
               <button
                 className="px-3 py-2 text-gray-600"
                 onClick={decrementQuantity}
@@ -203,13 +214,17 @@ function DetailProduct() {
               >
                 +
               </button>
-            </div>
-
-            <button className="flex-1 bg-gray-800 text-white py-2 px-4 hover:bg-gray-900 transition">
-              Add to bag
-            </button>
+            </div> */}
 
             <button
+              type="button"
+              onClick={handleWhatsapp}
+              className="flex-1 bg-gray-800 text-white py-2 px-4 hover:bg-gray-900 transition"
+            >
+              Pesan ke Penjual
+            </button>
+
+            {/* <button
               className="p-2 border border-gray-300"
               aria-label="Add to wishlist"
             >
@@ -227,7 +242,7 @@ function DetailProduct() {
                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                 />
               </svg>
-            </button>
+            </button> */}
           </div>
 
           {/* Store info - ✅ Bisa dikustomisasi dengan data toko dari product */}

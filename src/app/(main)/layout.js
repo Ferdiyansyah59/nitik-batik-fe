@@ -1,10 +1,9 @@
 // app/(main)/layout.tsx
-import Nav from "@/components/partials/Nav";
-import Footer from "@/components/partials/Footer";
-import ClientLayout from "@/components/partials/ClientLayout";
+import Nav from '@/components/partials/Nav';
+import Footer from '@/components/partials/Footer';
+import ClientLayout from '@/components/partials/ClientLayout';
 
-
-export default function MainLayout({children}) {
+export default function MainLayout({ children }) {
   return (
     <>
       <Nav />

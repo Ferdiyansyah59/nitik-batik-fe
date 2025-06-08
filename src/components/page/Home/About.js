@@ -5,11 +5,15 @@ import SectionTitle from '@/components/micro/SectionTitle';
 function About() {
   return (
     <section
-      className="flex justify-around mx-40 gap-20 my-20"
+      className="flex flex-col items-center md:items-start md:flex-row justify-around mx-5 md:mx-20 lg:mx-40 gap-20 my-20"
       data-aos="fade-up"
     >
-      <ImageComponent src="/img/about.png" className="w-96" alt="Home About" />
-      <div className="w-1/2" data-aos="fade-up">
+      <ImageComponent
+        src="/img/about.png"
+        className="w-60 lg:w-96"
+        alt="Home About"
+      />
+      <div className="w-4/5 lg:w-1/2" data-aos="fade-up">
         <SectionTitle title="Tentang Batik Kita" />
         <Description
           className="mt-3 text-justify"

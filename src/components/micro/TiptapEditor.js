@@ -206,13 +206,9 @@ const TiptapEditor = ({
       {/* Bagian UI Editor yang sudah ada */}
       <div className="max-w-4xl mx-auto p-4 sm:p-6 bg-white shadow-lg rounded-xl">
         <div className="mb-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1 sm:mb-2">
-            Tiptap Rich Text Editor
+          <h1 className="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-2">
+            Konten Artikel
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">
-            Editor teks lengkap dengan berbagai fitur formatting dan Tailwind
-            CSS.
-          </p>
         </div>
 
         {/* Toolbar */}
@@ -447,36 +443,6 @@ const TiptapEditor = ({
               )}
             </div>
           </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h4 className="font-semibold text-blue-800 mb-2">Cara Penggunaan:</h4>
-          <ul className="text-sm text-blue-700 space-y-1">
-            <li>• Gunakan toolbar di atas untuk memformat teks Anda.</li>
-            <li>
-              • Klik ikon link (
-              <Link2 size={12} className="inline-block -mt-0.5" />) untuk
-              menambahkan atau mengedit hyperlink.
-            </li>
-            <li>
-              • Klik ikon gambar (
-              <ImageIcon size={12} className="inline-block -mt-0.5" />) untuk
-              menambahkan gambar dari URL.
-            </li>
-            <li>
-              • Beralih antara mode Edit dan Preview menggunakan ikon mata (
-              <Eye size={12} className="inline-block -mt-0.5" />
-              ).
-            </li>
-            <li>
-              • Gunakan tombol (
-              <Save size={12} className="inline-block -mt-0.5" />) untuk
-              menyimpan dan (
-              <FileText size={12} className="inline-block -mt-0.5" />) untuk
-              memuat konten.
-            </li>
-          </ul>
         </div>
       </div>
     </div>

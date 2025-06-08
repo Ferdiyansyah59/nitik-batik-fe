@@ -18,17 +18,10 @@ export default function DashboardLayout({ children, role }) {
       { name: 'Dashboard', href: '/admin/dashboard', icon: '🏠' },
       { name: 'Articles', href: '/admin/dashboard/articles', icon: '📝' },
       { name: 'Users', href: '/admin/dashboard/users', icon: '👥' },
-      { name: 'Categories', href: '/admin/dashboard/categories', icon: '🏷️' },
-      { name: 'Reports', href: '/admin/dashboard/reports', icon: '📊' },
-      { name: 'Settings', href: '/admin/dashboard/settings', icon: '⚙️' },
     ],
     penjual: [
       { name: 'Dashboard', href: '/penjual/dashboard', icon: '🏠' },
       { name: 'Products', href: '/penjual/dashboard/products', icon: '🛍️' },
-      { name: 'Orders', href: '/penjual/dashboard/orders', icon: '📦' },
-      { name: 'Customers', href: '/penjual/dashboard/customers', icon: '👤' },
-      { name: 'Analytics', href: '/penjual/dashboard/analytics', icon: '📈' },
-      { name: 'Profile', href: '/penjual/dashboard/profile', icon: '⚙️' },
     ],
   };
 
@@ -59,7 +52,9 @@ export default function DashboardLayout({ children, role }) {
                     alt="logo"
                   />
                 ) : (
-                  <span className="text-2xl font-bold text-primary">N</span>
+                  <span className="text-2xl font-bold text-[#5D2E0C]">
+                    N<span className="text-[#A05A19]">B</span>
+                  </span>
                 )}
               </Link>
               <button
@@ -164,21 +159,6 @@ export default function DashboardLayout({ children, role }) {
             </button>
 
             <div className="flex items-center space-x-4">
-              <button className="p-2 rounded-md hover:bg-gray-100">
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-              </button>
               <Link
                 href="/"
                 className="text-sm text-gray-600 hover:text-gray-900"

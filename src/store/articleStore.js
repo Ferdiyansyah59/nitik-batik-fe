@@ -109,14 +109,18 @@ const useArticleStore = create((set) => ({
       if (response.data.status) {
         set({ article: response.data.data, loading: false });
       } else {
-        throw new Error(response.data.message);
+        throw new Error(response.data.message || '404: Article not found');
       }
     } catch (error) {
+      const errorMessage =
+        error.response?.status === 404
+          ? '404: Article not found'
+          : error.response?.data?.message ||
+            error.message ||
+            'Failed to fetch article';
+
       set({
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          'Failed to fetch article',
+        error: errorMessage,
         loading: false,
       });
       console.error('Error fetching article:', error);
