@@ -211,5 +211,5 @@ export function useAllProducts(options = {}) {
 }
 
 // ✅ Export sebagai named dan default export
-export { useAllProducts };
+// export { useAllProducts };
 export default useAllProducts;

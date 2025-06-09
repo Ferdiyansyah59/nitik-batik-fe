@@ -11,10 +11,10 @@ const nextConfig = {
   },
 
   // Optional: untuk optimasi Docker build
-  experimental: {
-    // Mengurangi ukuran bundle
-    outputFileTracingRoot: undefined,
-  },
+  // experimental: {
+  //   // Mengurangi ukuran bundle
+  //   outputFileTracingRoot: undefined,
+  // },
 };
 
 export default nextConfig;

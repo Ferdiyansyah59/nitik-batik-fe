@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import SectionSubtitle from '@/components/micro/SectionSubtitle';
 import Description from '@/components/micro/Description';
-import { useAllProducts } from '@/hooks/useAllProducts';
+import useAllProducts from '@/hooks/useAllProducts';
 
 // Format harga ke format Rupiah
 function formatRupiah(angka) {
