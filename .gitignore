@@ -41,4 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # GPT Configuration
-/src/app/api
+# /src/app/api
