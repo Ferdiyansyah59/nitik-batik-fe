@@ -6,8 +6,24 @@ services:
     build: .
     ports:
       - '1801:1801'
-    env_file:
-      - .env
+    environment:
+      - NEXT_PUBLIC_APP_NAME=NitikBatik
+      - NEXT_PUBLIC_API_ROUTE=http://82.112.230.106:1815/api
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - NEXT_PUBLIC_API_URL=http://82.112.230.106:1815
+      - NEXT_PUBLIC_ML_API_URL=http://82.112.230.106:5118/batik
+      - NEXT_PUBLIC_API_TIMEOUT=30000
+      - NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAXS6ZSLVrIKsEaZI6WyID6pdciy0kIiRI
+      - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=sampah-affbd.firebaseapp.com
+      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=sampah-affbd
+      - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=sampah-affbd.appspot.com
+      - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=900004600035
+      - NEXT_PUBLIC_FIREBASE_APP_ID=1:900004600035:web:d7da772b26ce8f1a78cdd6
+      - NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-DYDH3BVVVP
+      - NEXT_PUBLIC_MAX_FILE_SIZE=5242880
+      - NEXT_PUBLIC_ALLOWED_FILE_TYPES=image/jpeg,image/jpg,image/png,image/gif,image/webp
+      - NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD=true
+      - NEXT_PUBLIC_ENABLE_RICH_TEXT_EDITOR=true
     restart: unless-stopped
     container_name: nextjs-frontend
     networks:
