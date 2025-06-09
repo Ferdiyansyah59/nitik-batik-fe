@@ -152,13 +152,23 @@ export default function ImageUploadField({
       return preview;
     }
 
+    // Get base URL without trailing slash
+    const baseUrl = (
+      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'
+    ).replace(/\/$/, '');
+
     // If it's a relative path from backend, add the API URL
-    if (preview.startsWith('/') || preview.includes('uploads/')) {
-      return `${process.env.NEXT_PUBLIC_API_URL}${preview.startsWith('/') ? preview : '/' + preview}`;
+    if (preview.startsWith('/')) {
+      return `${baseUrl}${preview}`;
     }
 
-    // For other relative paths, add API URL
-    return `${process.env.NEXT_PUBLIC_API_URL}/${preview}`;
+    // For paths that include 'uploads/' but don't start with '/'
+    if (preview.includes('uploads/')) {
+      return `${baseUrl}/${preview}`;
+    }
+
+    // For other relative paths, add API URL with slash
+    return `${baseUrl}/${preview}`;
   };
 
   return (

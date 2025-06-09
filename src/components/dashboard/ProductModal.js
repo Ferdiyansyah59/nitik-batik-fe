@@ -1,8 +1,8 @@
-// src/components/dashboard/ProductModal.js
+// src/components/dashboard/ProductModal.js - SIMPLE FIX
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useProductManager, useProduct } from '@/hooks/useProducts';
+import { useState, useEffect, useCallback } from 'react';
+import { useProductManager } from '@/hooks/useProducts';
 import { useAuthStore } from '@/store/auth-store';
 
 export default function ProductModal({
@@ -13,10 +13,8 @@ export default function ProductModal({
 }) {
   const { createProduct, updateProduct, loading, error, clearError } =
     useProductManager();
-  // const { product } = useProduct();
   const { store } = useAuthStore();
 
-  // Determine if this is edit mode
   const isEditMode = !!product;
 
   const [formData, setFormData] = useState({
@@ -31,9 +29,19 @@ export default function ProductModal({
   const [existingImages, setExistingImages] = useState([]);
   const [imagesToDelete, setImagesToDelete] = useState([]);
 
-  // Pre-fill form data when editing
+  // ✅ SIMPLE FIX: Reset everything when modal opens/closes
   useEffect(() => {
-    console.log('Ini props', product);
+    if (!isOpen) {
+      // Cleanup when modal closes
+      imagePreviews.forEach((url) => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+      return;
+    }
+
+    // Reset form when modal opens
     if (isEditMode && product) {
       setFormData({
         name: product.name || '',
@@ -42,14 +50,9 @@ export default function ProductModal({
         category_id: product.category_id?.toString() || '',
       });
 
-      console.log('Ini dari edit ?', product.images);
-
-      // Set existing images for edit mode
-      if (product.images && product.images.length > 0) {
-        setExistingImages(product.images);
-      }
+      // Set existing images (create new array to prevent reference issues)
+      setExistingImages(product.images ? [...product.images] : []);
     } else {
-      // Reset form for create mode
       setFormData({
         name: '',
         description: '',
@@ -57,56 +60,81 @@ export default function ProductModal({
         category_id: '',
       });
       setExistingImages([]);
-      setImagesToDelete([]);
     }
-  }, [isEditMode, product]);
+
+    // Reset other states
+    setImages([]);
+    setImagePreviews([]);
+    setImagesToDelete([]);
+    clearError(); // Clear any previous errors
+  }, [isOpen, product?.id]); // ✅ Only depend on isOpen and product.id
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setImages(files);
 
-    // Create previews
+    // Cleanup old previews
+    imagePreviews.forEach((url) => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+
+    // Create new previews
     const previews = files.map((file) => URL.createObjectURL(file));
     setImagePreviews(previews);
   };
 
   const removeImage = (index) => {
     const newImages = images.filter((_, i) => i !== index);
-    const newPreviews = imagePreviews.filter((_, i) => i !== index);
-
-    // Revoke URL for removed preview
-    URL.revokeObjectURL(imagePreviews[index]);
-
     setImages(newImages);
+
+    // Cleanup removed preview
+    if (imagePreviews[index] && imagePreviews[index].startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreviews[index]);
+    }
+
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
     setImagePreviews(newPreviews);
   };
 
   const removeExistingImage = (imageToRemove) => {
-    setImagesToDelete((prev) => [...prev, imageToRemove]);
-    setExistingImages((prev) => prev.filter((img) => img !== imageToRemove));
+    const imagePath =
+      typeof imageToRemove === 'object' ? imageToRemove.image : imageToRemove;
+
+    setImagesToDelete((prev) => [...prev, imagePath]);
+    setExistingImages((prev) =>
+      prev.filter((img) => {
+        const currentPath = typeof img === 'object' ? img.image : img;
+        return currentPath !== imagePath;
+      }),
+    );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
 
+    if (!formData.name.trim() || !formData.harga || !formData.category_id) {
+      alert('Nama produk, harga, dan kategori harus diisi');
+      return;
+    }
+
     try {
       if (isEditMode) {
-        // Update existing product
         const updateData = {
-          ...formData,
+          name: formData.name.trim(),
+          description: formData.description.trim(),
+          harga: formData.harga,
+          category_id: formData.category_id,
         };
 
-        // Include image changes if any
-        if (images.length > 0 || imagesToDelete.length > 0) {
+        if (imagesToDelete.length > 0) {
           updateData.imagesToDelete = imagesToDelete;
         }
 
@@ -116,42 +144,46 @@ export default function ProductModal({
           images.length > 0 ? images : null,
         );
       } else {
-        // Create new product
         const productData = {
-          ...formData,
+          name: formData.name.trim(),
+          description: formData.description.trim(),
+          harga: formData.harga,
+          category_id: formData.category_id,
           store_id: store?.id?.toString() || store?.store_id?.toString(),
         };
+
         await createProduct(productData, images);
       }
-
-      // Reset form
-      setFormData({
-        name: '',
-        description: '',
-        harga: '',
-        category_id: '',
-      });
-      setImages([]);
-      setImagePreviews([]);
-      setExistingImages([]);
-      setImagesToDelete([]);
 
       onSuccess?.();
       onClose();
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error('Submit error:', error);
     }
   };
 
   const handleClose = () => {
-    // Revoke all preview URLs
-    imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-    setImagePreviews([]);
-    setImages([]);
-    setExistingImages([]);
-    setImagesToDelete([]);
+    // Cleanup blob URLs
+    imagePreviews.forEach((url) => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+
     clearError();
     onClose();
+  };
+
+  // ✅ SIMPLE IMAGE URL HELPER
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('blob:') || imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+    return imagePath.startsWith('/')
+      ? `${baseUrl}${imagePath}`
+      : `${baseUrl}/${imagePath}`;
   };
 
   if (!isOpen) return null;
@@ -186,7 +218,6 @@ export default function ProductModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Error Message */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
@@ -235,27 +266,32 @@ export default function ProductModal({
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
-                min="0"
+                min="1"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category ID *
+                Kategori *
               </label>
-              <input
-                type="number"
+              <select
                 name="category_id"
                 value={formData.category_id}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
-                min="1"
-                placeholder="Masukkan ID kategori"
-              />
+              >
+                <option value="">Pilih Kategori</option>
+                <option value="1">Kemeja Batik</option>
+                <option value="2">Blus Batik</option>
+                <option value="3">Kaos Batik</option>
+                <option value="4">Celana Batik</option>
+                <option value="5">Rok Batik</option>
+                <option value="6">Kain Batik</option>
+              </select>
             </div>
           </div>
 
-          {/* Images Section */}
+          {/* Images */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {isEditMode ? 'Tambah Gambar Baru' : 'Gambar Produk'}
@@ -265,11 +301,8 @@ export default function ProductModal({
               multiple
               accept="image/*"
               onChange={handleImageChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
-            <p className="text-sm text-gray-500 mt-1">
-              Pilih beberapa gambar (maksimal 5)
-            </p>
           </div>
 
           {/* Current Images (Edit Mode) */}
@@ -279,22 +312,44 @@ export default function ProductModal({
                 Gambar Saat Ini
               </label>
               <div className="grid grid-cols-3 gap-4">
-                {existingImages.map((image, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${image.image}`}
-                      alt={`Product image ${index + 1}`}
-                      className="w-full h-24 object-cover rounded border"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeExistingImage(image.image)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                {existingImages.map((imageObj, index) => {
+                  const imagePath =
+                    typeof imageObj === 'object' ? imageObj.image : imageObj;
+                  const imageUrl = getImageUrl(imagePath);
+
+                  return (
+                    <div key={`existing-${index}`} className="relative">
+                      <div className="w-full h-24 bg-gray-100 rounded border flex items-center justify-center overflow-hidden">
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={`Product ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // ✅ SIMPLE ERROR HANDLING - just hide broken images
+                              e.target.style.display = 'none';
+                              e.target.nextElementSibling.style.display =
+                                'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div
+                          className="w-full h-full flex items-center justify-center text-gray-400 text-xs"
+                          style={{ display: 'none' }}
+                        >
+                          Gambar tidak tersedia
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeExistingImage(imageObj)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
               {imagesToDelete.length > 0 && (
                 <p className="text-sm text-red-600 mt-2">
@@ -308,11 +363,11 @@ export default function ProductModal({
           {imagePreviews.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {isEditMode ? 'Preview Gambar Baru' : 'Preview Gambar'}
+                Preview Gambar Baru
               </label>
               <div className="grid grid-cols-3 gap-4">
                 {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative">
+                  <div key={`preview-${index}`} className="relative">
                     <img
                       src={preview}
                       alt={`Preview ${index + 1}`}

@@ -3,10 +3,7 @@ import { create } from 'zustand';
 import axios from 'axios';
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_ROUTE ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.NEXT_PUBLIC_BASE_URL ||
-  'http://localhost:8081/api';
+  process.env.NEXT_PUBLIC_API_ROUTE || 'http://localhost:8081/api';
 
 console.log('🔧 Product Store API URL:', API_URL);
 
@@ -198,6 +195,34 @@ const useProductStore = create((set, get) => ({
     }
   },
 
+  // Delete Prouct
+  deleteProduct: async (slug) => {
+    set({ loading: true, error: null });
+    try {
+      // Panggil API endpoint untuk menghapus produk
+      const response = await axiosInstance.delete(`/product/${slug}`);
+
+      if (response.data.status) {
+        // Jika berhasil, hapus produk dari state lokal agar UI terupdate
+        set((state) => ({
+          products: state.products.filter((p) => p.slug !== slug),
+          loading: false,
+        }));
+        return true; // Kembalikan true jika berhasil
+      } else {
+        throw new Error(response.data.message || 'Gagal menghapus produk');
+      }
+    } catch (error) {
+      console.error('❌ Error deleting product:', error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Gagal menghapus produk';
+      set({ error: errorMessage, loading: false });
+      throw error; // Lemparkan error agar bisa ditangkap di komponen
+    }
+  },
+
   // ✅ Create product
   createProduct: async (productData, images) => {
     set({ loading: true, error: null });
@@ -267,100 +292,75 @@ const useProductStore = create((set, get) => ({
       console.log('🔧 Product data:', productData);
       console.log('🔧 New images:', images?.length || 0);
 
-      let requestData;
-      let requestConfig = {};
+      // ✅ DEBUG: Log imagesToDelete specifically
+      console.log('🗑️ Images to delete:', productData.imagesToDelete);
 
-      if (images && images.length > 0) {
-        // ✅ If images are provided, use FormData
-        console.log('📦 Using FormData for update with images');
+      // ✅ ALWAYS use FormData (backend expects this)
+      const formData = new FormData();
 
-        const formData = new FormData();
-
-        // Add product data
-        Object.keys(productData).forEach((key) => {
-          if (productData[key] !== null && productData[key] !== undefined) {
-            formData.append(key, productData[key]);
-            console.log(`📝 Added field: ${key} = ${productData[key]}`);
-          }
-        });
-
-        // Add new images
-        images.forEach((image, index) => {
-          formData.append('images', image);
-          console.log(`🖼️ Added new image ${index + 1}: ${image.name}`);
-        });
-
-        requestData = formData;
-        // ✅ Do NOT set Content-Type manually for FormData
-        requestConfig = {
-          // headers: { 'Content-Type': 'multipart/form-data' }, // ❌ Remove this
-        };
-      } else {
-        // ✅ If no images, send JSON
-        console.log('📦 Using JSON for update without images');
-
-        requestData = productData;
-        requestConfig = {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        };
-      }
-
-      const response = await axiosInstance.put(
-        `/product/${slug}`,
-        requestData,
-        requestConfig,
+      // Add basic fields
+      formData.append('name', productData.name || '');
+      formData.append('description', productData.description || '');
+      formData.append('harga', productData.harga?.toString() || '0');
+      formData.append(
+        'category_id',
+        productData.category_id?.toString() || '1',
       );
 
-      console.log('✅ Product update response:', response.data);
+      // Add imagesToDelete as JSON string
+      if (productData.imagesToDelete && productData.imagesToDelete.length > 0) {
+        const imagesToDeleteJSON = JSON.stringify(productData.imagesToDelete);
+        console.log('📦 Sending imagesToDelete JSON:', imagesToDeleteJSON);
+        formData.append('imagesToDelete', imagesToDeleteJSON);
+      }
+
+      // Add new images
+      if (images && images.length > 0) {
+        images.forEach((image, index) => {
+          formData.append('images', image);
+          console.log(`📸 Added image ${index + 1}:`, image.name);
+        });
+      }
+
+      // ✅ DEBUG: Log all FormData entries
+      console.log('📤 FormData contents:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}:`, value);
+      }
+
+      // Send request
+      const response = await axiosInstance.put(`/product/${slug}`, formData, {
+        timeout: 60000,
+      });
+
+      console.log('📥 Response:', response.data);
 
       if (response.data.status) {
-        set({ loading: false });
-        return response.data.data;
+        const updatedProduct = response.data.data;
+
+        // Update local state
+        const currentProducts = get().products || [];
+        const updatedProducts = currentProducts.map((p) =>
+          p.slug === slug ? { ...p, ...updatedProduct } : p,
+        );
+
+        set({
+          products: updatedProducts,
+          product: updatedProduct,
+          loading: false,
+        });
+
+        return updatedProduct;
       } else {
         throw new Error(response.data.message || 'Failed to update product');
       }
     } catch (error) {
       console.error('❌ Error updating product:', error);
-
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
         'Failed to update product';
-
-      set({
-        error: errorMessage,
-        loading: false,
-      });
-
-      throw error;
-    }
-  },
-
-  // ✅ Delete product
-  deleteProduct: async (slug) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await axiosInstance.delete(`/product/${slug}`);
-
-      if (response.data.status) {
-        const currentProducts = get().products || [];
-        const updatedProducts = currentProducts.filter((p) => p.slug !== slug);
-        set({ products: updatedProducts, loading: false });
-        return true;
-      } else {
-        throw new Error(response.data.message);
-      }
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      set({
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          'Failed to delete product',
-        loading: false,
-      });
+      set({ error: errorMessage, loading: false });
       throw error;
     }
   },

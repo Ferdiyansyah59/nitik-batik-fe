@@ -1,49 +1,22 @@
-// // src/hooks/useArticles.js
-// import { useEffect } from 'react';
 // import useArticleStore from '@/store/articleStore';
+// import { useCallback, useEffect, useMemo } from 'react';
 
-// export const useArticles = (page = 1, limit = 10, search = '') => {
-//   const {
-//     articles,
-//     pagination,
-//     loading,
-//     error,
-//     fetchArticles,
-//     createArticle,
-//     updateArticle,
-//   } = useArticleStore();
+// export function useArticles() {
+//   const { articles, fetchArticles } = useArticleStore();
 
-//   useEffect(() => {
-//     fetchArticles(page, limit, search);
-//   }, [fetchArticles, page, limit, search]);
+//   const safeArticles = useMemo(() => {
+//     return Array.isArray(articles) ? articles : [];
+//   }, [articles]);
 
-//   return { articles, pagination, loading, error };
-// };
-
-// export const useArticleBySlug = (slug) => {
-//   const { article, loading, error, fetchArticleBySlug } = useArticleStore();
-
-//   useEffect(() => {
-//     if (slug) {
-//       fetchArticleBySlug(slug);
+//   const fetchArticle = useCallback(async () => {
+//     try {
+//       await fetchArticle();
+//     } catch (error) {
+//       console.log('useArticle: Error fetching Article');
 //     }
-//   }, [fetchArticleBySlug, slug]);
+//   }, [fetchArticles]);
 
-//   return { article, loading, error };
-// };
-
-// export const createArticle = (articleData) => {
-//   try {
-//     createArticle(articleData);
-//   } catch (err) {
-//     console.log(err.message);
-//   }
-// };
-
-// export const updateArticle = (id, articleData) => {
-//   try {
-//     updateArticle(id, articleData);
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
+//   useEffect(() => {
+//     if
+//   })
+// }

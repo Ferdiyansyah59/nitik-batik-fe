@@ -256,6 +256,19 @@ export function useProducts(options = {}) {
   };
 }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 // ✅ Hook untuk single product
 export function useProduct(initialSlug = null) {
   const {
@@ -333,6 +346,13 @@ export function useProduct(initialSlug = null) {
     hasProduct: !!product,
   };
 }
+
+//
+//
+//
+//
+//
+//
 
 // ✅ Hook untuk manage products (create, update, delete)
 export function useProductManager() {

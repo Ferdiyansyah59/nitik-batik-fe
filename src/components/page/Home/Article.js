@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 
 function Article() {
-  const { articles, fetchLatestArticles, loading, error } = useArticleStore();
+  const { latestArticle, fetchLatestArticles, loading, error } =
+    useArticleStore();
 
   useEffect(() => {
     fetchLatestArticles();
@@ -27,7 +28,7 @@ function Article() {
 
       {/* ✅ 5 kolom dalam 1 baris */}
       <div className="grid grid-rows-5 grid-cols-1 lg:grid-rows-1 lg:grid-cols-5 gap-6">
-        {articles.map((item, idx) => (
+        {latestArticle.map((item, idx) => (
           <div
             key={idx}
             className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border"
@@ -46,7 +47,7 @@ function Article() {
                 {item.title}
               </h3>
               <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-                {item.excerpt}
+                {item.excerpt?.replace(/<[^>]*>/g, '')}
               </p>
 
               <Link

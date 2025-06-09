@@ -5,7 +5,8 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 
 // API URL
-const API_URL = process.env.API_ROUTE || 'http://localhost:8081/api';
+const API_URL =
+  process.env.NEXT_PUBLIC_API_ROUTE || 'http://localhost:8081/api';
 
 // ✅ Token validation helper dengan auto-logout
 const isTokenValid = (token) => {

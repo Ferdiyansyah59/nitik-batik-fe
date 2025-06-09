@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useStoreData } from '@/hooks/useStore';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import { useProducts } from '@/hooks/useProducts';
+import { Link } from 'lucide-react';
+import Image from 'next/image';
 
 export default function SellerDashboardPage() {
   const router = useRouter();
@@ -86,87 +89,6 @@ export default function SellerDashboardPage() {
     );
   }
 
-  // Mock data untuk dashboard
-  const stats = [
-    {
-      title: 'Total Produk',
-      value: '24',
-      change: '+3',
-      icon: '🛍️',
-      color: 'blue',
-    },
-    {
-      title: 'Pesanan Bulan Ini',
-      value: '45',
-      change: '+12',
-      icon: '📦',
-      color: 'green',
-    },
-    {
-      title: 'Total Pelanggan',
-      value: '128',
-      change: '+8',
-      icon: '👥',
-      color: 'purple',
-    },
-    {
-      title: 'Pendapatan Bulan Ini',
-      value: 'Rp 12.5M',
-      change: '+15%',
-      icon: '💰',
-      color: 'yellow',
-    },
-  ];
-
-  const recentOrders = [
-    {
-      id: 1,
-      customer: 'Budi Santoso',
-      product: 'Kemeja Batik Parang',
-      amount: 'Rp 250.000',
-      status: 'Pending',
-      time: '2 jam lalu',
-    },
-    {
-      id: 2,
-      customer: 'Siti Nurhaliza',
-      product: 'Blus Batik Kawung',
-      amount: 'Rp 180.000',
-      status: 'Processing',
-      time: '4 jam lalu',
-    },
-    {
-      id: 3,
-      customer: 'Ahmad Wijaya',
-      product: 'Kain Batik Solo',
-      amount: 'Rp 450.000',
-      status: 'Shipped',
-      time: '6 jam lalu',
-    },
-    {
-      id: 4,
-      customer: 'Maya Sari',
-      product: 'Rok Batik Modern',
-      amount: 'Rp 320.000',
-      status: 'Delivered',
-      time: '1 hari lalu',
-    },
-  ];
-
-  const colorMap = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    purple: 'bg-purple-100 text-purple-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
-  };
-
-  const statusColors = {
-    Pending: 'bg-yellow-100 text-yellow-800',
-    Processing: 'bg-blue-100 text-blue-800',
-    Shipped: 'bg-purple-100 text-purple-800',
-    Delivered: 'bg-green-100 text-green-800',
-  };
-
   return (
     <DashboardLayout role="penjual">
       <div className="space-y-6">
@@ -193,7 +115,7 @@ export default function SellerDashboardPage() {
             {/* ✅ Store Actions */}
             <div className="flex space-x-2">
               <button
-                onClick={() => router.push('/store')}
+                onClick={() => router.push(`/store/${store.id}`)}
                 className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 text-sm"
               >
                 Lihat Toko
@@ -208,122 +130,104 @@ export default function SellerDashboardPage() {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <div key={index} className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 text-sm">{stat.title}</p>
-                  <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                  <p className="text-sm mt-2">
-                    <span className="text-green-600 font-medium">
-                      {stat.change}
-                    </span>{' '}
-                    dari bulan lalu
-                  </p>
-                </div>
-                <div className={`p-3 rounded-full ${colorMap[stat.color]}`}>
-                  <span className="text-2xl">{stat.icon}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Orders */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Pesanan Terbaru</h2>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between py-3 border-b last:border-0"
-                  >
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{order.customer}</p>
-                      <p className="text-xs text-gray-500">{order.product}</p>
-                      <p className="text-xs text-gray-400 mt-1">{order.time}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">{order.amount}</p>
-                      <span
-                        className={`inline-block px-2 py-1 text-xs rounded-full ${statusColors[order.status]}`}
-                      >
-                        {order.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4">
-                <button
-                  onClick={() => router.push('/penjual/dashboard/orders')}
-                  className="w-full text-center text-sm text-primary hover:text-primary/80"
-                >
-                  Lihat Semua Pesanan →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Aksi Cepat</h2>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => router.push('/penjual/dashboard/products/add')}
-                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <span className="text-2xl">➕</span>
-                  <p className="mt-2 text-sm font-medium">Tambah Produk</p>
-                </button>
-                <button
-                  onClick={() => router.push('/penjual/dashboard/orders')}
-                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <span className="text-2xl">📦</span>
-                  <p className="mt-2 text-sm font-medium">Kelola Pesanan</p>
-                </button>
-                <button
-                  onClick={() => router.push('/penjual/dashboard/customers')}
-                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <span className="text-2xl">👥</span>
-                  <p className="mt-2 text-sm font-medium">Data Pelanggan</p>
-                </button>
-                <button
-                  onClick={() => router.push('/penjual/dashboard/analytics')}
-                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <span className="text-2xl">📊</span>
-                  <p className="mt-2 text-sm font-medium">Lihat Analitik</p>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* ✅ Store Performance Chart */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            Performa Toko - {store?.name}
-          </h2>
-          <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
-            <p className="text-gray-500">
-              Chart visualisasi performa toko akan ditampilkan di sini
-            </p>
-          </div>
-        </div>
+        <ProductGrid />
       </div>
     </DashboardLayout>
   );
 }
+
+const ProductGrid = () => {
+  const { products, loading, isEmpty, formatPrice } = useProducts();
+
+  // ✅ Ambil hanya 8 produk pertama
+  const limitedProducts = products.slice(0, 8);
+
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-lg font-semibold mb-4">Produk Terbaru Anda</h2>
+
+      {loading ? (
+        <div className="h-64 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-gray-600">Memuat produk...</p>
+          </div>
+        </div>
+      ) : isEmpty ? (
+        <div className="h-64 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-gray-400 mb-4">
+              <svg
+                className="mx-auto h-16 w-16"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Belum Ada Produk
+            </h3>
+            <p className="text-gray-600">
+              Mulai dengan menambahkan produk pertama Anda
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {limitedProducts.map((product) => (
+            <div
+              key={product.id}
+              className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+            >
+              {/* Product Image */}
+              <div className="relative h-32 bg-gray-100">
+                {product.thumbnail ? (
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${product.thumbnail}`}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400">
+                    <svg
+                      className="w-8 h-8"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              {/* Product Info */}
+              <div className="p-3">
+                <h3 className="font-medium text-gray-900 mb-1 text-sm line-clamp-2">
+                  {product.name}
+                </h3>
+                <p className="text-sm font-bold text-primary">
+                  {formatPrice(product.harga)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

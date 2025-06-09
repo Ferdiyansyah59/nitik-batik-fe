@@ -4,7 +4,7 @@ import Link from 'next/link';
 function Hero() {
   return (
     <section
-      className={`bg-amber-white h-[60vh] md:h-[40vh] xl:h-[70vh] mt-20 flex justify-center items-start bg-cover bg-bottom bg-[url('/img/hero.jpg')]`}
+      className={`bg-amber-white h-[60vh] md:h-[40vh] xl:h-[70vh] mt-8 lg:mt-20 flex justify-center items-start bg-cover bg-bottom bg-[url('/img/hero.jpg')]`}
       style={{ backgroundImage: "url('/img/hero_1.png')" }}
     >
       <div className="mx-10 md:mx-0 md:w-1/2 flex flex-col items-center">

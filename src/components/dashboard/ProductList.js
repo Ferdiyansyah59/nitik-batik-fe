@@ -51,16 +51,28 @@ export default function ProductList() {
   };
 
   const handleEdit = async (slug) => {
-    console.log('Edit ', slug);
-    try {
-      // ✅ Gunakan return value dari fetchProduct
-      const productData = await fetchProduct(slug);
-      console.log('Product data:', productData); // ✅ Ini akan ada datanya
+    console.log('🔧 Edit product:', slug);
 
-      setSelectedProduct(productData);
-      setShowModal(true);
+    try {
+      // ✅ FIXED: Gunakan return value dari fetchProduct
+      const productData = await fetchProduct(slug);
+
+      if (productData) {
+        console.log('✅ Product data loaded for edit:', productData);
+
+        // ✅ FIXED: Pastikan images dalam format yang benar
+        const processedProduct = {
+          ...productData,
+          images: Array.isArray(productData.images) ? productData.images : [],
+        };
+
+        setSelectedProduct(processedProduct);
+        setShowModal(true);
+      } else {
+        throw new Error('Product data not found');
+      }
     } catch (error) {
-      console.error('Error fetching product for edit:', error);
+      console.error('❌ Error fetching product for edit:', error);
       alert('Gagal memuat data produk: ' + error.message);
     }
   };
@@ -179,86 +191,6 @@ export default function ProductList() {
                 </p>
                 <p className="text-2xl font-bold text-blue-900">
                   {stats.totalProducts}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-full">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-green-600 text-sm font-medium">Tersedia</p>
-                <p className="text-2xl font-bold text-green-900">
-                  {stats.inStock}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-yellow-50 p-4 rounded-lg">
-            <div className="flex items-center">
-              <div className="p-3 bg-yellow-100 rounded-full">
-                <svg
-                  className="w-6 h-6 text-yellow-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-yellow-600 text-sm font-medium">
-                  Stok Rendah
-                </p>
-                <p className="text-2xl font-bold text-yellow-900">
-                  {stats.lowStock}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-red-50 p-4 rounded-lg">
-            <div className="flex items-center">
-              <div className="p-3 bg-red-100 rounded-full">
-                <svg
-                  className="w-6 h-6 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-red-600 text-sm font-medium">Habis</p>
-                <p className="text-2xl font-bold text-red-900">
-                  {stats.outOfStock}
                 </p>
               </div>
             </div>
@@ -428,13 +360,7 @@ export default function ProductList() {
                           Edit
                         </button>
                         <Link
-                          href={`/penjual/dashboard/products/${product.slug}`}
-                          className="text-green-600 hover:text-green-800 text-sm"
-                        >
-                          Detail
-                        </Link>
-                        <Link
-                          href={`/store/product/${product.slug}`}
+                          href={`/store/detail-product/${product.slug}`}
                           target="_blank"
                           className="text-purple-600 hover:text-purple-800 text-sm"
                         >

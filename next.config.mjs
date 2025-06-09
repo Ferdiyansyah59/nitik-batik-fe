@@ -1,7 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Untuk Docker deployment
+  output: 'standalone',
+
+  // Konfigurasi images
   images: {
-    domains: ['localhost'],
+    // domains: ['localhost'],
+    // Tambahkan domain production jika ada
+    domains: ['localhost', 'http://82.112.230.106:1801'],
+  },
+
+  // Optional: untuk optimasi Docker build
+  experimental: {
+    // Mengurangi ukuran bundle
+    outputFileTracingRoot: undefined,
   },
 };
 

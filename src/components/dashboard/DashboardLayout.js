@@ -18,6 +18,7 @@ export default function DashboardLayout({ children, role }) {
       { name: 'Dashboard', href: '/admin/dashboard', icon: '🏠' },
       { name: 'Articles', href: '/admin/dashboard/articles', icon: '📝' },
       { name: 'Users', href: '/admin/dashboard/users', icon: '👥' },
+      { name: 'Stores', href: '/admin/dashboard/stores', icon: '🏬' },
     ],
     penjual: [
       { name: 'Dashboard', href: '/penjual/dashboard', icon: '🏠' },

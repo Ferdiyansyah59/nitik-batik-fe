@@ -204,14 +204,14 @@ function ProductsPageByStore() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-16 lg:mt-20">
       {/* Header Section */}
       {/* Header Section - Improved Design */}
       <section className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto">
           {/* Banner Section */}
           {isStoreDataLoaded && storeData.banner ? (
-            <div className="relative h-64 md:h-80 lg:h-96 overflow-hidden">
+            <div className="relative h-96 md:h-80 lg:h-96 overflow-hidden">
               {/* Banner Image */}
               <div
                 className="absolute inset-0 bg-cover bg-center"

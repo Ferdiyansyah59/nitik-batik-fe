@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <section>
+    <section className="overflow-x-hidden">
       <Hero />
       <About />
       {/* <Category /> */}

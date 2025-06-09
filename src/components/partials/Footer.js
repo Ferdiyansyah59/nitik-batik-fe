@@ -1,5 +1,5 @@
-import Link from "next/link";
-import ImageComponent from "../micro/ImageComponent";
+import Link from 'next/link';
+import ImageComponent from '../micro/ImageComponent';
 
 function Footer() {
   return (
@@ -7,14 +7,14 @@ function Footer() {
       <div className="flex flex-col items-center justify-center py-10">
         <ImageComponent src="/img/logo.png" className="w-60" alt="logo" />
         <div className="flex gap-5 mt-3">
-          <Link className="underline" href="/">
-            Home
+          <Link className="" href="/">
+            Beranda
           </Link>
-          <Link className="underline" href="/">
-            Article
+          <Link className="" href="/articles">
+            Artikel
           </Link>
-          <Link className="underline" href="/">
-            Shop
+          <Link className="" href="/store">
+            Katalog Batik
           </Link>
         </div>
       </div>

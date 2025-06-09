@@ -166,7 +166,7 @@ function ProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-10 lg:mt-28">
       {/* Header Section */}
       <section className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-16">

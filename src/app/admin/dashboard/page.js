@@ -7,11 +7,13 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import useUserStore from '@/store/userStore';
 import useArticleStore from '@/store/articleStore';
 import { useDashboardData } from '@/hooks/useDashboard';
+import Link from 'next/link';
 
 export default function AdminDashboardPage() {
   const { statistic } = useDashboardData();
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
+  const { latestArticle, fetchLatestArticles } = useArticleStore();
 
   // ✅ Loading state untuk menunggu rehydration
   const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +37,10 @@ export default function AdminDashboardPage() {
       }
     }
   }, [isLoading, hasCheckedAuth, isAuthenticated, user, router]);
+
+  useEffect(() => {
+    fetchLatestArticles();
+  }, [fetchLatestArticles]);
 
   // ✅ Show loading saat menunggu rehydration
   if (isLoading) {
@@ -76,44 +82,15 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Total Products',
-      value: '890',
-      change: '+8%',
+      value: statistic.totalProducts,
       icon: '🛍️',
       color: 'purple',
     },
     {
-      title: 'Total Revenue',
-      value: 'Rp 45.6M',
-      change: '+15%',
-      icon: '💰',
+      title: 'Total Store',
+      value: statistic.totalStores,
+      icon: '🏬',
       color: 'yellow',
-    },
-  ];
-
-  const recentActivities = [
-    {
-      id: 1,
-      user: 'John Doe',
-      action: 'created a new article',
-      time: '2 hours ago',
-    },
-    {
-      id: 2,
-      user: 'Jane Smith',
-      action: 'updated product information',
-      time: '4 hours ago',
-    },
-    {
-      id: 3,
-      user: 'Mike Johnson',
-      action: 'registered as a new seller',
-      time: '6 hours ago',
-    },
-    {
-      id: 4,
-      user: 'Sarah Williams',
-      action: 'placed a new order',
-      time: '8 hours ago',
     },
   ];
 
@@ -168,26 +145,30 @@ export default function AdminDashboardPage() {
 
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Activities */}
+          {/* Latest Article */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Recent Activities</h2>
+              <h2 className="text-lg font-semibold">Artikel Terbaru</h2>
             </div>
             <div className="p-6">
               <div className="space-y-4">
-                {recentActivities.map((activity) => (
+                {latestArticle.map((item, _) => (
                   <div
-                    key={activity.id}
+                    key={item.id}
                     className="flex items-center justify-between py-3 border-b last:border-0"
                   >
                     <div>
                       <p className="text-sm">
-                        <span className="font-medium">{activity.user}</span>{' '}
-                        {activity.action}
+                        <span className="font-medium">{item.title}</span>{' '}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {activity.time}
-                      </p>
+                      <Link
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-500"
+                        href={`/articles/${item.slug}`}
+                      >
+                        {item.slug}
+                      </Link>
                     </div>
                   </div>
                 ))}

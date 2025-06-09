@@ -5,9 +5,10 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import DataTable from '@/components/dashboard/DataTable';
 import axios from 'axios';
 import useUserStore from '@/store/userStore';
+import useStoreStore from '@/store/storeStore';
 
 export default function AdminArticlesPage() {
-  const { users, loading, fetchUsers } = useUserStore();
+  const { stores, loading, fetchAllStoreData } = useStoreStore();
 
   // Configure axios defaults
   useEffect(() => {
@@ -19,8 +20,8 @@ export default function AdminArticlesPage() {
   }, []);
 
   useEffect(() => {
-    fetchUsers(1, 100); // Fetch all articles
-  }, [fetchUsers]);
+    fetchAllStoreData(1, 100); // Fetch all articles
+  }, [fetchAllStoreData]);
 
   // Table columns configuration
   const columns = [
@@ -29,12 +30,12 @@ export default function AdminArticlesPage() {
       label: 'name',
     },
     {
-      key: 'email',
-      label: 'email',
+      key: 'whatsapp',
+      label: 'whatsapp',
     },
     {
-      key: 'role',
-      label: 'role',
+      key: 'alamat',
+      label: 'alamat',
     },
     {
       key: 'created_At',
@@ -48,7 +49,7 @@ export default function AdminArticlesPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Memuat data users...</p>
+          <p className="mt-4 text-gray-600">Memuat data toko...</p>
         </div>
       </div>
     );
@@ -87,8 +88,8 @@ export default function AdminArticlesPage() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-gray-500 text-sm">Total Users</p>
-                <p className="text-2xl font-bold">{users.length}</p>
+                <p className="text-gray-500 text-sm">Total Toko</p>
+                <p className="text-2xl font-bold">{stores.length}</p>
               </div>
             </div>
           </div>
@@ -97,7 +98,7 @@ export default function AdminArticlesPage() {
         {/* Data Table */}
         <DataTable
           columns={columns}
-          data={users}
+          data={stores}
           searchPlaceholder="Search articles..."
           addButtonText="Add Article"
         />

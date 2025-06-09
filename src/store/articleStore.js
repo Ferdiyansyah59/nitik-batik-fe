@@ -28,6 +28,7 @@ axiosInstance.interceptors.request.use(
 
 const useArticleStore = create((set) => ({
   articles: [],
+  latestArticle: [],
   article: null,
   pagination: {
     page: 1,
@@ -82,7 +83,7 @@ const useArticleStore = create((set) => ({
       // console.log('INI', res.data.data);
       if (res.data.status) {
         set({
-          articles: res.data.data,
+          latestArticle: res.data.data,
           loading: false,
         });
       } else {

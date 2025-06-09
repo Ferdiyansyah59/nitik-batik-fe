@@ -113,7 +113,7 @@ function DetailProduct() {
   const hasImages = productImages.length > 0;
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 mt-20">
       <div className="flex flex-col md:flex-row gap-8">
         {/* Left Column - Product Images */}
         <div className="md:w-3/5">

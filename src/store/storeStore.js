@@ -4,9 +4,7 @@ import axios from 'axios';
 import { useAuthStore } from './auth-store';
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_ROUTE ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:8081/api';
+  process.env.NEXT_PUBLIC_API_ROUTE || 'http://localhost:8081/api';
 
 // Create axios instance
 const axiosInstance = axios.create({
@@ -32,9 +30,16 @@ axiosInstance.interceptors.request.use(
 );
 
 const useStoreStore = create((set, get) => ({
+  stores: [],
   store: null,
   loading: false,
   error: null,
+  pagination: {
+    page: 1,
+    limit: 10,
+    totalItems: 0,
+    totalPages: 0,
+  },
 
   // ✅ Get current store - prioritas ke local store, fallback ke auth store
   getCurrentStore: () => {
@@ -273,6 +278,42 @@ const useStoreStore = create((set, get) => ({
     throw lastError;
   },
 
+  // Fetching stores data for admin
+  fetchAllStoreData: async (page = 1, limit = 10, search = '') => {
+    set({ loading: true, error: null });
+    try {
+      const params = {
+        page: page.toString(),
+        limit: limit.toString(),
+      };
+
+      if (search) {
+        params.search = search;
+      }
+
+      const response = await axiosInstance.get('/stores-data', { params });
+
+      if (response.data.status) {
+        set({
+          stores: response.data.data.stores,
+          pagination: response.data.data.pagination,
+          loading: false,
+        });
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      set({
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          'Failed to fetch articles',
+        loading: false,
+      });
+      console.error('Error fetching articles:', error);
+    }
+  },
+
   // Clear error
   clearError: () => {
     set({ error: null });
@@ -314,6 +355,13 @@ const useStoreStore = create((set, get) => ({
         console.log('ℹ️ Could not initialize store:', error.message);
       }
     }
+  },
+
+  // Change pagination
+  setPage: (page) => {
+    set((state) => ({
+      pagination: { ...state.pagination, page },
+    }));
   },
 
   // ✅ Clear all store data

@@ -1,0 +1,18 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    ports:
+      - '1801:1801'
+    env_file:
+      - .env
+    restart: unless-stopped
+    container_name: nextjs-frontend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
