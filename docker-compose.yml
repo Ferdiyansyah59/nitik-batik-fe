@@ -4,9 +4,7 @@ version: '3.8'
 services:
   frontend:
     build: .
-    ports:
-      - '1801:1801'
-    environment:
+    args:
       - NEXT_PUBLIC_APP_NAME=NitikBatik
       - NEXT_PUBLIC_API_ROUTE=http://82.112.230.106:1815/api
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -24,6 +22,8 @@ services:
       - NEXT_PUBLIC_ALLOWED_FILE_TYPES=image/jpeg,image/jpg,image/png,image/gif,image/webp
       - NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD=true
       - NEXT_PUBLIC_ENABLE_RICH_TEXT_EDITOR=true
+    ports:
+      - '1801:1801'
     restart: unless-stopped
     container_name: nextjs-frontend
     networks:
