@@ -152,7 +152,8 @@ export default function ImageUploadField({
               src={
                 preview.startsWith('http')
                   ? preview
-                  : `http://localhost:8081${preview}`
+                  : process.env.NEXT_PUBLIC_API_URL ||
+                    `http://localhost:8081${preview}`
               }
               alt="Preview"
               className="w-full h-48 object-cover"

@@ -13,9 +13,9 @@ export const metadata = {
     template: `${process.env.NEXT_PUBLIC_APP_NAME} - %s`,
     default: `${process.env.NEXT_PUBLIC_APP_NAME} - Platform Edukasi dan UMKM Batik`,
   },
-  icons: {
-    icon: '/img/nb_logo.png',
-  },
+  // icons: {
+  //   icon: '/img/nb_logo.png',
+  // },
   description:
     'NitikBatik adalah platform digital yang bertujuan untuk mengedukasi masyarakat tentang warisan budaya batik Indonesia sekaligus mendukung UMKM dalam mempromosikan dan memperluas jangkauan produk batik mereka secara online.',
   siteName: `${process.env.NEXT_PUBLIC_APP_NAME}`,
@@ -27,6 +27,31 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* ICO dulu (highest priority) */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+
+        {/* PNG untuk modern browsers */}
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/img/nb_logo.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/img/nb_logo.png"
+        />
+
+        {/* Apple devices */}
+        <link rel="apple-touch-icon" href="/img/nb_logo.png" />
+
+        {/* Legacy */}
+        <link rel="shortcut icon" href="/favicon.ico" />
+      </head>
+
       <body className={`${getPoppins.variable} antialiased`}>{children}</body>
     </html>
   );

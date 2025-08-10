@@ -309,12 +309,17 @@ export default function ProductList() {
                   {/* Product Image */}
                   <div className="relative h-48 bg-gray-100">
                     {product.thumbnail ? (
-                      <Image
-                        src={`${process.env.NEXT_PUBLIC_API_URL}${product.thumbnail}`}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                      />
+                      <>
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_API_URL}${product.thumbnail}`}
+                          alt={product.name}
+                          className="object-cover w-full h-full"
+                        />
+
+                        <br />
+                        <p>{product.thumbnail}</p>
+                        <p>{process.env.NEXT_PUBLIC_API_URL}</p>
+                      </>
                     ) : (
                       <div className="flex items-center justify-center h-full text-gray-400">
                         <svg
